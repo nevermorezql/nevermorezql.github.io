@@ -6,18 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2017/8 | NEVERMORE</title>
+  <title>神经网络(1) | NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="周庆龙个人技术博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEVERMORE">
-<meta property="og:url" content="http://yoursite.com/archives/2017/08/index.html">
+  <meta name="description" content="神经网络概述 翻译 ：Neural Network  神经网络 最简单的神经网络：  根据房屋的大小预测价格：  12345678910x -&amp;gt; 房屋面积y -&amp;gt; 房屋价格ReLu -&amp;gt; 修正线性单元input(X) ---&amp;gt; neuron（ReLu） ---&amp;gt; output(y)X到Y是一个计算，需要一个线性函数计算，这个线性函数就是 ReLu ,Re代表修正，约定">
+<meta name="keywords" content="技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="神经网络(1)">
+<meta property="og:url" content="http://yoursite.com/2017/08/30/2017-8-30-andrew-1/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="周庆龙个人技术博客">
+<meta property="og:description" content="神经网络概述 翻译 ：Neural Network  神经网络 最简单的神经网络：  根据房屋的大小预测价格：  12345678910x -&amp;gt; 房屋面积y -&amp;gt; 房屋价格ReLu -&amp;gt; 修正线性单元input(X) ---&amp;gt; neuron（ReLu） ---&amp;gt; output(y)X到Y是一个计算，需要一个线性函数计算，这个线性函数就是 ReLu ,Re代表修正，约定">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_1.png">
+<meta property="og:image" content="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_2.png">
+<meta property="og:updated_time" content="2017-09-01T01:23:47.653Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NEVERMORE">
-<meta name="twitter:description" content="周庆龙个人技术博客">
+<meta name="twitter:title" content="神经网络(1)">
+<meta name="twitter:description" content="神经网络概述 翻译 ：Neural Network  神经网络 最简单的神经网络：  根据房屋的大小预测价格：  12345678910x -&amp;gt; 房屋面积y -&amp;gt; 房屋价格ReLu -&amp;gt; 修正线性单元input(X) ---&amp;gt; neuron（ReLu） ---&amp;gt; output(y)X到Y是一个计算，需要一个线性函数计算，这个线性函数就是 ReLu ,Re代表修正，约定">
+<meta name="twitter:image" content="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_1.png">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -155,36 +160,83 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-2017-8-30-andrew-1" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/30/2017-8-30-andrew-1/" class="archive-article-date">
-  	<time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/30/2017-8-30-andrew-1/">神经网络(1)</a>
+    <h1 class="article-title" itemprop="name">
+      神经网络(1)
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/08/30/2017-8-30-andrew-1/" class="archive-article-date">
+  	<time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="神经网络概述"><a href="#神经网络概述" class="headerlink" title="神经网络概述"></a>神经网络概述</h2><ol>
+<li>翻译 ：Neural Network  神经网络</li>
+<li>最简单的神经网络：</li>
+</ol>
+<p><strong>根据房屋的大小预测价格</strong>：<br> <img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_1.png" alt="image"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">x -&gt; 房屋面积</div><div class="line">y -&gt; 房屋价格</div><div class="line">ReLu -&gt; 修正线性单元</div><div class="line">input(X) ---&gt; neuron（ReLu） ---&gt; output(y)</div><div class="line"></div><div class="line">X到Y是一个计算，需要一个线性函数计算，</div><div class="line">这个线性函数就是 ReLu ,</div><div class="line">Re代表修正，约定了x和y不可能小于0，算是输入输出的条件约束</div><div class="line"></div><div class="line">Neuron 神经元</div></pre></td></tr></table></figure>
+<p>已上就是一个简单的神经网络，只有一个神经元</p>
+<ol>
+<li>复杂的神经网络</li>
+</ol>
+<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_2.png" alt="image"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// 复杂的神经网络</div><div class="line"></div><div class="line">x1,x2,x3,x4 属于 input值，通过不同的ReLU单元运算，输出另外一个值，</div><div class="line">通过第二层的ReLU 得出结果</div><div class="line"></div><div class="line">相当于多个神经元叠加在一起</div></pre></td></tr></table></figure></p>
+<ol>
+<li><p>Supervised Learning 监督学习</p>
+<ul>
+<li>有明确的Input和Output的学习</li>
+<li>机器学习获得到的主要成果</li>
+</ul>
+</li>
+<li><p>Type of Neural Networks</p>
+<ol>
+<li>Convolutional Neural NetWork 卷积神经网络<br>处理Image </li>
+<li>Standard Neural NetWork   标准神经网络<br>上面提到的价格预测就属于 SNN 解决的问题 </li>
+<li>Recurrent Neural NetWork  循环神经网络<br> 主要处理一维数据，Sequence Data(Audio-&gt;Text,Engish-&gt;Chinese)</li>
+</ol>
+</li>
+<li><p>Data Category</p>
+<ol>
+<li>Structured Data : database,every data cell has confirmed meaning </li>
+<li>Unstructured Data : image,text,audio,video …</li>
+</ol>
+</li>
+<li><p>现阶段神经网络的应用</p>
+<ol>
+<li>语音识别 RNN</li>
+<li>图片识别 CNN</li>
+<li>结果预测 SNN</li>
+<li>自动驾驶 RNN + CNN + SNN 自动驾驶是一个复杂的系统，需要结合多种神经网络</li>
+<li>广告推荐 SNN</li>
+</ol>
+</li>
+</ol>
+<ol>
+<li>为什么神经网络和机器学习会突然兴起 <ol>
+<li>Data ：data become cheap and large</li>
+<li>Computation： resouce become stronger</li>
+<li>Algorithms： new algorithms</li>
+</ol>
+</li>
+</ol>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -196,7 +248,7 @@ var _hmt = _hmt || [];
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -209,409 +261,113 @@ var _hmt = _hmt || [];
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/08/30/2017-8-30-andrew-1/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/29/2017-8-29-md-1/" class="archive-article-date">
-  	<time datetime="2017-08-28T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-29</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2017/08/29/2017-8-29-md-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android Material Design(1)</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/29/2017-8-29-md-1/">Android Material Design(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/MD/" class="article-tag-list-link color3">MD</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/28/2017-8-28-tensor-flow-2/" class="archive-article-date">
-  	<time datetime="2017-08-27T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-28</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/28/2017-8-28-tensor-flow-2/">算法和数理统计(1)</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/算法和数理统计/" class="article-tag-list-link color3">算法和数理统计</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/22/2017-8-22-tensor-flow-1/" class="archive-article-date">
-  	<time datetime="2017-08-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/22/2017-8-22-tensor-flow-1/">TensorFlow学习笔记(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/AI/" class="article-tag-list-link color3">AI</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/17/2017-8-17-view-4/" class="archive-article-date">
-  	<time datetime="2017-08-16T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-17</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/17/2017-8-17-view-4/">View绘制学习笔记(4)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/16/2017-8-14-view-3/" class="archive-article-date">
-  	<time datetime="2017-08-15T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-16</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/16/2017-8-14-view-3/">View绘制学习笔记(3)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/14/2017-8-14-view-2/" class="archive-article-date">
-  	<time datetime="2017-08-14T04:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-14</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/14/2017-8-14-view-2/">View绘制学习笔记(2)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/11/2017-8-11-view-1/" class="archive-article-date">
-  	<time datetime="2017-08-11T04:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/11/2017-8-11-view-1/">View绘制学习笔记(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/09/about-study/" class="archive-article-date">
-  	<time datetime="2017-08-09T07:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-09</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/09/about-study/">关于学习</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/得到APP/" class="article-tag-list-link color1">得到APP</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
+  
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script>
+  var cloudTieConfig = {
+    url: "http://yoursite.com/2017/08/30/2017-8-30-andrew-1/", 
+    sourceId: "2017-8-30-andrew-1",
+    productKey: "true",
+    target: "cloud-tie-wrapper"
+  };
+</script>
+<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -634,8 +390,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
