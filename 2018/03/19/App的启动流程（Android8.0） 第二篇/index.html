@@ -6,18 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Category: 得到APP | NEVERMORE</title>
+  <title>App启动流程（Android 8.0源码）(2) | NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="周庆龙个人技术博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEVERMORE">
-<meta property="og:url" content="http://yoursite.com/categories/得到APP/index.html">
+  <meta name="description" content="App的启动流程源码分析（Android8.0源码） 第二篇 启动的核心逻辑个人的感想再写这篇文章看了一遍源码，总是在不经意间跟丢了，对于最开始分析源码的同学来说，这是很常见的，Android系统框架层的复杂性非常之高，大部分的源码是为了处理各种各样的异常业务。后来读了很多网上分析源码的文章，发现大多数也只是跟进代码，一步步下来，并没有深入的分析。所以学习源码来说，最最重要的是先要了解整个调用的架">
+<meta name="keywords" content="技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="App启动流程（Android 8.0源码）(2)">
+<meta property="og:url" content="http://yoursite.com/2018/03/19/App的启动流程（Android8.0） 第二篇/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="周庆龙个人技术博客">
+<meta property="og:description" content="App的启动流程源码分析（Android8.0源码） 第二篇 启动的核心逻辑个人的感想再写这篇文章看了一遍源码，总是在不经意间跟丢了，对于最开始分析源码的同学来说，这是很常见的，Android系统框架层的复杂性非常之高，大部分的源码是为了处理各种各样的异常业务。后来读了很多网上分析源码的文章，发现大多数也只是跟进代码，一步步下来，并没有深入的分析。所以学习源码来说，最最重要的是先要了解整个调用的架">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1417629-1e3a8402380f8a17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-03-19T03:51:31.115Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NEVERMORE">
-<meta name="twitter:description" content="周庆龙个人技术博客">
+<meta name="twitter:title" content="App启动流程（Android 8.0源码）(2)">
+<meta name="twitter:description" content="App的启动流程源码分析（Android8.0源码） 第二篇 启动的核心逻辑个人的感想再写这篇文章看了一遍源码，总是在不经意间跟丢了，对于最开始分析源码的同学来说，这是很常见的，Android系统框架层的复杂性非常之高，大部分的源码是为了处理各种各样的异常业务。后来读了很多网上分析源码的文章，发现大多数也只是跟进代码，一步步下来，并没有深入的分析。所以学习源码来说，最最重要的是先要了解整个调用的架">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1417629-1e3a8402380f8a17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -155,71 +159,205 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-App的启动流程（Android8.0） 第二篇" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/09/about-study/" class="archive-article-date">
-  	<time datetime="2017-08-09T07:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-09</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/09/about-study/">关于学习</a>
+    <h1 class="article-title" itemprop="name">
+      App启动流程（Android 8.0源码）(2)
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2018/03/19/App的启动流程（Android8.0） 第二篇/" class="archive-article-date">
+  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="App的启动流程源码分析（Android8-0源码）-第二篇-启动的核心逻辑"><a href="#App的启动流程源码分析（Android8-0源码）-第二篇-启动的核心逻辑" class="headerlink" title="App的启动流程源码分析（Android8.0源码） 第二篇 启动的核心逻辑"></a>App的启动流程源码分析（Android8.0源码） 第二篇 启动的核心逻辑</h2><h3 id="个人的感想"><a href="#个人的感想" class="headerlink" title="个人的感想"></a>个人的感想</h3><p>再写这篇文章看了一遍源码，总是在不经意间跟丢了，对于最开始分析源码的同学来说，这是很常见的，Android系统框架层的复杂性非常之高，大部分的源码是为了处理各种各样的异常业务。后来读了很多网上分析源码的文章，发现大多数也只是跟进代码，一步步下来，并没有深入的分析。所以学习源码来说，最最重要的是先要了解整个调用的架构，在有这个架构的基础上在阅读，不必深入每一个细节，能把读到的源码放到整个框架中去就可以了。</p>
+<h3 id="先上一张图（来源于Android进阶之光）"><a href="#先上一张图（来源于Android进阶之光）" class="headerlink" title="先上一张图（来源于Android进阶之光）"></a>先上一张图（来源于Android进阶之光）</h3><p><strong>App启动涉及到的进程</strong><br><img src="http://upload-images.jianshu.io/upload_images/1417629-1e3a8402380f8a17.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>根据上图可以大概分析出来：</p>
+<ol>
+<li>AMS进程只负责通讯，和保存App的栈信息，记录，跟其它进程的交互，校验等，真正创建App的地方实在ApplicationThread中进行的</li>
+<li>因为AMS是在SystemServer进程中，这样设计的好处是，隔离了这几个进程的源码，开发各自不干扰，只是交互比较麻烦</li>
+<li>真正App的生命周期的反馈也是在ApplicationThread中进行的，可以这样理解，因为它们都属于独立的进程，进程的对象是不共享的，所以Activity的创建只能在App进程中进行，而对于App进程的回调，也必须只能依靠于此对象</li>
+</ol>
+<p>所以我们阅读源码主要看几个地方：</p>
+<ol>
+<li>AMS 的源码  启动前的准备，栈的管理，日志记录</li>
+<li>ApplicationThead (ActivityThread中的内部类) Activity的创建、生命周期处理、加载等</li>
+<li>Zygnote   如何创建App进程，AMS如何通知Zygnote</li>
+<li>Launcher 进程，启动的入口（上一章已经分析）</li>
+<li>找到他们之间交互方式</li>
+</ol>
+<hr>
+<h2 id="AMS创建一个新的进程"><a href="#AMS创建一个新的进程" class="headerlink" title="AMS创建一个新的进程"></a>AMS创建一个新的进程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div></pre></td><td class="code"><pre><div class="line">private final void startProcessLocked(ProcessRecord app, String hostingType,</div><div class="line">            String hostingNameStr, String abiOverride, String entryPoint, String[] entryPointArgs) &#123;</div><div class="line">             //省略代码</div><div class="line">            ...</div><div class="line">            ProcessStartResult startResult;</div><div class="line">            if (hostingType.equals(&quot;webview_service&quot;)) &#123;</div><div class="line">                startResult = startWebView(entryPoint,</div><div class="line">                        app.processName, uid, uid, gids, debugFlags, mountExternal,</div><div class="line">                        app.info.targetSdkVersion, seInfo, requiredAbi, instructionSet,</div><div class="line">                        app.info.dataDir, null, entryPointArgs);</div><div class="line">            &#125; else &#123;</div><div class="line">                //此处启动的一个普通的进程</div><div class="line">                startResult = Process.start(entryPoint,</div><div class="line">                        app.processName, uid, uid, gids, debugFlags, mountExternal,</div><div class="line">                        app.info.targetSdkVersion, seInfo, requiredAbi, instructionSet,</div><div class="line">                        app.info.dataDir, invokeWith, entryPointArgs); </div><div class="line">            &#125;</div><div class="line">            checkTime(startTime, &quot;startProcess: returned from zygote!&quot;);</div><div class="line">            Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</div><div class="line">            //省略代码</div><div class="line">           ... </div><div class="line"></div><div class="line"></div><div class="line">Zygote最终调用的代码</div><div class="line">：</div><div class="line">    /**</div><div class="line">     * Sends an argument list to the zygote process, which starts a new child</div><div class="line">     * and returns the child&apos;s pid. Please note: the present implementation</div><div class="line">     * replaces newlines in the argument list with spaces.</div><div class="line">     *</div><div class="line">     * @throws ZygoteStartFailedEx if process start failed for any reason</div><div class="line">     */</div><div class="line">    @GuardedBy(&quot;mLock&quot;)</div><div class="line">    private static Process.ProcessStartResult zygoteSendArgsAndGetResult(</div><div class="line">            ZygoteState zygoteState, ArrayList&lt;String&gt; args)</div><div class="line">            throws ZygoteStartFailedEx &#123;</div><div class="line">        try &#123;</div><div class="line">            // Throw early if any of the arguments are malformed. This means we can</div><div class="line">            // avoid writing a partial response to the zygote.</div><div class="line">            int sz = args.size();</div><div class="line">            for (int i = 0; i &lt; sz; i++) &#123;</div><div class="line">                if (args.get(i).indexOf(&apos;\n&apos;) &gt;= 0) &#123;</div><div class="line">                    throw new ZygoteStartFailedEx(&quot;embedded newlines not allowed&quot;);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            /**</div><div class="line">             * See com.android.internal.os.SystemZygoteInit.readArgumentList()</div><div class="line">             * Presently the wire format to the zygote process is:</div><div class="line">             * a) a count of arguments (argc, in essence)</div><div class="line">             * b) a number of newline-separated argument strings equal to count</div><div class="line">             *</div><div class="line">             * After the zygote process reads these it will write the pid of</div><div class="line">             * the child or -1 on failure, followed by boolean to</div><div class="line">             * indicate whether a wrapper process was used.</div><div class="line">             */</div><div class="line">             </div><div class="line">             </div><div class="line">            //通过Socket方式的把  组装好的字符串数据发给Zygnote进程，进而孵化出可用的线程</div><div class="line">            final BufferedWriter writer = zygoteState.writer;</div><div class="line">            final DataInputStream inputStream = zygoteState.inputStream;</div><div class="line"></div><div class="line">            writer.write(Integer.toString(args.size()));</div><div class="line">            writer.newLine();</div><div class="line"></div><div class="line">            for (int i = 0; i &lt; sz; i++) &#123;</div><div class="line">                String arg = args.get(i);</div><div class="line">                writer.write(arg);</div><div class="line">                writer.newLine();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            writer.flush();</div><div class="line"></div><div class="line">            // Should there be a timeout on this?</div><div class="line">            Process.ProcessStartResult result = new Process.ProcessStartResult();</div><div class="line"></div><div class="line">            // Always read the entire result from the input stream to avoid leaving</div><div class="line">            // bytes in the stream for future process starts to accidentally stumble</div><div class="line">            // upon.</div><div class="line">            result.pid = inputStream.readInt();</div><div class="line">            result.usingWrapper = inputStream.readBoolean();</div><div class="line"></div><div class="line">            if (result.pid &lt; 0) &#123;</div><div class="line">                throw new ZygoteStartFailedEx(&quot;fork() failed&quot;);</div><div class="line">            &#125;</div><div class="line">            return result;</div><div class="line">        &#125; catch (IOException ex) &#123;</div><div class="line">            zygoteState.close();</div><div class="line">            throw new ZygoteStartFailedEx(ex);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h2 id="AMS如何管理Activity（简单分析）"><a href="#AMS如何管理Activity（简单分析）" class="headerlink" title="AMS如何管理Activity（简单分析）"></a>AMS如何管理Activity（简单分析）</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ActivityManager.getService().startActivityAsUser(</div><div class="line">                mMainThread.getApplicationThread(), getBasePackageName(), intent,</div><div class="line">                intent.resolveTypeIfNeeded(getContentResolver()),</div><div class="line">                null, null, 0, Intent.FLAG_ACTIVITY_NEW_TASK, null, options,</div><div class="line">                user.getIdentifier());</div></pre></td></tr></table></figure>
+<p>来启动App的,在8.0中，回去Service是通过如下的方式获取的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">public static IActivityManager getService() &#123;</div><div class="line">    return IActivityManagerSingleton.get();</div><div class="line">&#125;</div><div class="line"></div><div class="line">private static final Singleton&lt;IActivityManager&gt; IActivityManagerSingleton =</div><div class="line">        new Singleton&lt;IActivityManager&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            protected IActivityManager create() &#123;</div><div class="line">                final IBinder b = ServiceManager.getService(Context.ACTIVITY_SERVICE);</div><div class="line">                final IActivityManager am = IActivityManager.Stub.asInterface(b);</div><div class="line">                return am;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div></pre></td></tr></table></figure></p>
+<p>由此可见，还是通过binder机制，最终调用ActivityManagerService中的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public final int startActivityAsUser(IApplicationThread caller, String callingPackage,</div><div class="line">        Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,</div><div class="line">        int startFlags, ProfilerInfo profilerInfo, Bundle bOptions, int userId) &#123;</div><div class="line">    </div><div class="line">    //确认当前用户增对启动App是否是隔离的对象</div><div class="line">    enforceNotIsolatedCaller(&quot;startActivity&quot;);</div><div class="line">    </div><div class="line">    //校验权限，有问题排除安全异常，这里返回的targetUserID是防止出现发起启动的app，被卸载或者丢失的情况，这是会拿当前userid作为发起者</div><div class="line">    userId = mUserController.handleIncomingUser(Binder.getCallingPid(), Binder.getCallingUid(),</div><div class="line">            userId, false, ALLOW_FULL_ONLY, &quot;startActivity&quot;, null);</div><div class="line">    // TODO: Switch to user app stacks here.</div><div class="line">    </div><div class="line">    //调用启动app的方法 </div><div class="line">    return mActivityStarter.startActivityMayWait(caller, -1, callingPackage, intent,</div><div class="line">            resolvedType, null, null, resultTo, resultWho, requestCode, startFlags,</div><div class="line">            profilerInfo, null, null, bOptions, false, userId, null, null,</div><div class="line">            &quot;startActivityAsUser&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>重点来了，最核心的启动代码：</p>
+<p><strong>重点分析</strong></p>
+<ol>
+<li>ActivityStarter是在ActivityManagerService中直接new出来的</li>
+<li>在new的时候，同时传递了一个 ActivityStackSupervisor 对象进去</li>
+<li>ActivityStackSupervisor 作为任务栈的管理类，也是通过new直接创建的</li>
+<li>接着看源码，一句一句分析：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div></pre></td><td class="code"><pre><div class="line">final int startActivityMayWait(IApplicationThread caller, int callingUid,</div><div class="line">            String callingPackage, Intent intent, String resolvedType,</div><div class="line">            IVoiceInteractionSession voiceSession, IVoiceInteractor voiceInteractor,</div><div class="line">            IBinder resultTo, String resultWho, int requestCode, int startFlags,</div><div class="line">            ProfilerInfo profilerInfo, WaitResult outResult,</div><div class="line">            Configuration globalConfig, Bundle bOptions, boolean ignoreTargetSecurity, int userId,</div><div class="line">            IActivityContainer iContainer, TaskRecord inTask, String reason) &#123;</div><div class="line">        // Refuse possible leaked file descriptors</div><div class="line">        </div><div class="line">        //校验intent的合法性，当出现文件描述符时，直接抛出异常，至于为什么，还不清楚？</div><div class="line">        if (intent != null &amp;&amp; intent.hasFileDescriptors()) &#123;</div><div class="line">            throw new IllegalArgumentException(&quot;File descriptors passed in Intent&quot;);</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        //同时 trace 开始记录启动一个app的日志 </div><div class="line">        mSupervisor.mActivityMetricsLogger.notifyActivityLaunching();</div><div class="line">        </div><div class="line">        //是否指定了component</div><div class="line">        boolean componentSpecified = intent.getComponent() != null;</div><div class="line"></div><div class="line">        // Save a copy in case ephemeral needs it</div><div class="line">        final Intent ephemeralIntent = new Intent(intent);</div><div class="line">        // Don&apos;t modify the client&apos;s object!</div><div class="line">        intent = new Intent(intent);</div><div class="line">        </div><div class="line">        //针对instant app（类似于google平台的小程序），逻辑进行简单的修改，去掉指定的component</div><div class="line">        if (componentSpecified</div><div class="line">                &amp;&amp; intent.getData() != null</div><div class="line">                &amp;&amp; Intent.ACTION_VIEW.equals(intent.getAction())</div><div class="line">                &amp;&amp; mService.getPackageManagerInternalLocked()</div><div class="line">                        .isInstantAppInstallerComponent(intent.getComponent())) &#123;</div><div class="line">            // intercept intents targeted directly to the ephemeral installer the</div><div class="line">            // ephemeral installer should never be started with a raw URL; instead</div><div class="line">            // adjust the intent so it looks like a &quot;normal&quot; instant app launch</div><div class="line">            intent.setComponent(null /*component*/);</div><div class="line">            componentSpecified = false;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //通过内部的 PackageManager获取intent关联的组件信息（图标，名称，类等）</div><div class="line">        ResolveInfo rInfo = mSupervisor.resolveIntent(intent, resolvedType, userId);</div><div class="line">        if (rInfo == null) &#123;</div><div class="line">            // 根据userId(android中通过userId代表不同的应用)，拿到userinfo</div><div class="line">            UserInfo userInfo = mSupervisor.getUserInfo(userId);</div><div class="line">            if (userInfo != null &amp;&amp; userInfo.isManagedProfile()) &#123;</div><div class="line">                // Special case for managed profiles, if attempting to launch non-cryto aware</div><div class="line">                // app in a locked managed profile from an unlocked parent allow it to resolve</div><div class="line">                // as user will be sent via confirm credentials to unlock the profile.</div><div class="line">                UserManager userManager = UserManager.get(mService.mContext);</div><div class="line">                boolean profileLockedAndParentUnlockingOrUnlocked = false;</div><div class="line">                long token = Binder.clearCallingIdentity();</div><div class="line">                try &#123;</div><div class="line">                    UserInfo parent = userManager.getProfileParent(userId);</div><div class="line">                    profileLockedAndParentUnlockingOrUnlocked = (parent != null)</div><div class="line">                            &amp;&amp; userManager.isUserUnlockingOrUnlocked(parent.id)</div><div class="line">                            &amp;&amp; !userManager.isUserUnlockingOrUnlocked(userId);</div><div class="line">                &#125; finally &#123;</div><div class="line">                    Binder.restoreCallingIdentity(token);</div><div class="line">                &#125;</div><div class="line">                if (profileLockedAndParentUnlockingOrUnlocked) &#123;</div><div class="line">                    rInfo = mSupervisor.resolveIntent(intent, resolvedType, userId,</div><div class="line">                            PackageManager.MATCH_DIRECT_BOOT_AWARE</div><div class="line">                                    | PackageManager.MATCH_DIRECT_BOOT_UNAWARE);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        // Collect information about the target of the Intent.</div><div class="line">        //根据resolveInfo获取最终的activityinfo（这里保存了activity启动时需要的全部信息）</div><div class="line">        ActivityInfo aInfo = mSupervisor.resolveActivity(intent, rInfo, startFlags, profilerInfo);</div><div class="line">        </div><div class="line">        //activity启动的一些配置信息</div><div class="line">        ActivityOptions options = ActivityOptions.fromBundle(bOptions);</div><div class="line">        </div><div class="line">        //省略部分代码</div><div class="line">        ...</div><div class="line">            int res = startActivityLocked(caller, intent, ephemeralIntent, resolvedType,</div><div class="line">                    aInfo, rInfo, voiceSession, voiceInteractor,</div><div class="line">                    resultTo, resultWho, requestCode, callingPid,</div><div class="line">                    callingUid, callingPackage, realCallingPid, realCallingUid, startFlags,</div><div class="line">                    options, ignoreTargetSecurity, componentSpecified, outRecord, container,</div><div class="line">                    inTask, reason);</div><div class="line">         //省略部分代码</div><div class="line">           ...</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    </div><div class="line">    ***********************************************</div><div class="line">    int startActivityLocked(IApplicationThread caller, Intent intent, Intent ephemeralIntent,</div><div class="line">            String resolvedType, ActivityInfo aInfo, ResolveInfo rInfo,</div><div class="line">            IVoiceInteractionSession voiceSession, IVoiceInteractor voiceInteractor,</div><div class="line">            IBinder resultTo, String resultWho, int requestCode, int callingPid, int callingUid,</div><div class="line">            String callingPackage, int realCallingPid, int realCallingUid, int startFlags,</div><div class="line">            ActivityOptions options, boolean ignoreTargetSecurity, boolean componentSpecified,</div><div class="line">            ActivityRecord[] outActivity, ActivityStackSupervisor.ActivityContainer container,</div><div class="line">            TaskRecord inTask, String reason) &#123;</div><div class="line">        //省略部分源码</div><div class="line">        ...</div><div class="line">        mLastStartActivityResult = startActivity(caller, intent, ephemeralIntent, resolvedType,</div><div class="line">                aInfo, rInfo, voiceSession, voiceInteractor, resultTo, resultWho, requestCode,</div><div class="line">                callingPid, callingUid, callingPackage, realCallingPid, realCallingUid, startFlags,</div><div class="line">                options, ignoreTargetSecurity, componentSpecified, mLastStartActivityRecord,</div><div class="line">                container, inTask);</div><div class="line">        //省略部分源码</div><div class="line">       ...</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    </div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    ...</div><div class="line">    </div><div class="line">    </div><div class="line">    经过一些列的调用,终于：</div><div class="line">     // Note: This method should only be called from &#123;@link startActivity&#125;.</div><div class="line">    private int startActivityUnchecked(final ActivityRecord r, ActivityRecord sourceRecord,</div><div class="line">            IVoiceInteractionSession voiceSession, IVoiceInteractor voiceInteractor,</div><div class="line">            int startFlags, boolean doResume, ActivityOptions options, TaskRecord inTask,</div><div class="line">            ActivityRecord[] outActivity) &#123;</div><div class="line"></div><div class="line">        ...</div><div class="line">            if (mDoResume) &#123;</div><div class="line">                mSupervisor.resumeFocusedStackTopActivityLocked();</div><div class="line">            &#125;</div><div class="line">            ...</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">   ...中间经过ActivityStack的几次回调</div><div class="line">   </div><div class="line">     调用到这里</div><div class="line">     app.thActivityThreadread.scheduleLaunchActivity(new Intent(r.intent), r.appToken,</div><div class="line">                    System.identityHashCode(r), r.info,</div><div class="line">                    // TODO: Have this take the merged configuration instead of separate global and</div><div class="line">                    // override configs.</div><div class="line">                    mergedConfiguration.getGlobalConfiguration(),</div><div class="line">                    mergedConfiguration.getOverrideConfiguration(), r.compat,</div><div class="line">                    r.launchedFromPackage, task.voiceInteractor, app.repProcState, r.icicle,</div><div class="line">                    r.persistentState, results, newIntents, !andResume,</div><div class="line">                    mService.isNextTransitionForward(), profilerInfo);</div><div class="line">                    </div><div class="line">                    </div><div class="line">        //注意此处回调到ApplicationThread的进程了</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="ApplicationThread的内部处理"><a href="#ApplicationThread的内部处理" class="headerlink" title="ApplicationThread的内部处理"></a>ApplicationThread的内部处理</h2><ol>
+<li>scheduleLaunchActivity  – SendMessage LAUNCH_ACTIVITY</li>
+<li>处理消息时，调用 handleLaunchActivity </li>
+<li>调用 performLaunchActivity</li>
+<li>创建对象 以及回调生命周期<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">java.lang.ClassLoader cl = appContext.getClassLoader();</div><div class="line">          activity = mInstrumentation.newActivity(</div><div class="line">                  cl, component.getClassName(), r.intent);</div><div class="line">  ...</div><div class="line">      activity.mCalled = false;</div><div class="line">              if (r.isPersistable()) &#123;</div><div class="line">                  mInstrumentation.callActivityOnCreate(activity, r.state, r.persistentState);</div><div class="line">              &#125; else &#123;</div><div class="line">                  mInstrumentation.callActivityOnCreate(activity, r.state);</div><div class="line">              &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>至此，代码大概分析完毕！</p>
+<p>因为整个启动流程涉及到的代码确实很多，贴代码的方式后面肯定就不可以使用了！</p>
+<p>后面以真个架构为主，主要分析流程和整体结构图！</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/得到APP/" class="article-tag-list-link color1">得到APP</a>
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
         		</li>
       		
 		</ul>
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2018/03/19/App的启动流程（Android8.0） 第二篇/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2018/03/16/App的启动流程（Android8.0） 第一篇/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">App启动流程（Android 8.0源码）(1)</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
+  
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script>
+  var cloudTieConfig = {
+    url: "http://yoursite.com/2018/03/19/App的启动流程（Android8.0） 第二篇/", 
+    sourceId: "App的启动流程（Android8.0） 第二篇",
+    productKey: "true",
+    target: "cloud-tie-wrapper"
+  };
+</script>
+<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -242,10 +380,10 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
-		isCategory: true,
+		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
 		root: "/",
