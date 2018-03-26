@@ -6,18 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives | NEVERMORE</title>
+  <title>Handler详解 | NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="周庆龙个人技术博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEVERMORE">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+  <meta name="description" content="概述Handler是Android提供的跨线程通讯的一个框架，非常的实用。在整个Android源码中使用的非常广泛！Handler跨线程的核心原理是通过共享内存完成的。通过向共享内存区域的 消息队列写入消息，通过队列循环，不断的从队列中拿到消息，并且在消息循环中处理数据！ 分析方式分析主要针对Framework层的源码。理清楚全部的调用关系 12345framework/base/core/jav">
+<meta name="keywords" content="技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Handler详解">
+<meta property="og:url" content="http://yoursite.com/2018/03/22/Handler详解/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="周庆龙个人技术博客">
+<meta property="og:description" content="概述Handler是Android提供的跨线程通讯的一个框架，非常的实用。在整个Android源码中使用的非常广泛！Handler跨线程的核心原理是通过共享内存完成的。通过向共享内存区域的 消息队列写入消息，通过队列循环，不断的从队列中拿到消息，并且在消息循环中处理数据！ 分析方式分析主要针对Framework层的源码。理清楚全部的调用关系 12345framework/base/core/jav">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-03-26T02:04:10.329Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NEVERMORE">
-<meta name="twitter:description" content="周庆龙个人技术博客">
+<meta name="twitter:title" content="Handler详解">
+<meta name="twitter:description" content="概述Handler是Android提供的跨线程通讯的一个框架，非常的实用。在整个Android源码中使用的非常广泛！Handler跨线程的核心原理是通过共享内存完成的。通过向共享内存区域的 消息队列写入消息，通过队列循环，不断的从队列中拿到消息，并且在消息循环中处理数据！ 分析方式分析主要针对Framework层的源码。理清楚全部的调用关系 12345framework/base/core/jav">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -155,340 +157,51 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-Handler详解" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      Handler详解
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/22/Handler详解/" class="archive-article-date">
+
+        
+        <a href="/2018/03/22/Handler详解/" class="archive-article-date">
   	<time datetime="2018-03-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-22</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/22/Handler详解/">Handler详解</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
+        
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/20/Android Binder机制-3(ServiceManager)/" class="archive-article-date">
-  	<time datetime="2018-03-19T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/20/Android Binder机制-3(ServiceManager)/">Binder-3 (ServiceManager)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/19/Android Binder机制-2(参照GitYuan)/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">Binder-2 (Gityuan Blog)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/19/App的启动流程（Android8.0） 第二篇/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/19/App的启动流程（Android8.0） 第二篇/">App启动流程（Android 8.0源码）(2)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/18/Android Binder机制-1(参照Gityuan)/" class="archive-article-date">
-  	<time datetime="2018-03-17T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-18</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/18/Android Binder机制-1(参照Gityuan)/">Binder-1 (Gityuan Blog)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/16/App的启动流程（Android8.0） 第一篇/" class="archive-article-date">
-  	<time datetime="2018-03-15T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-16</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/16/App的启动流程（Android8.0） 第一篇/">App启动流程（Android 8.0源码）(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
+    <div class="article-entry" itemprop="articleBody">
       
-        </div></section>
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Handler是Android提供的跨线程通讯的一个框架，非常的实用。在整个Android源码中使用的非常广泛！<br>Handler跨线程的核心原理是通过共享内存完成的。通过向共享内存区域的 消息队列写入消息，通过队列循环，不断的从队列中拿到消息，并且在消息循环中处理数据！</p>
+<h3 id="分析方式"><a href="#分析方式" class="headerlink" title="分析方式"></a>分析方式</h3><p>分析主要针对Framework层的源码。理清楚全部的调用关系</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">framework/base/core/java/andorid/os/</div><div class="line">  - Handler.java</div><div class="line">  - Looper.java</div><div class="line">  - Message.java</div><div class="line">  - MessageQueue.java</div></pre></td></tr></table></figure>
+<h3 id="调用过程"><a href="#调用过程" class="headerlink" title="调用过程"></a>调用过程</h3><p>主要方法的调用入口,从postMessage 或者 sendMessage 开始</p>
+<p>所有的sendMessage最终都会调用到以下方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) &#123;</div><div class="line">      msg.target = this;</div><div class="line">      if (mAsynchronous) &#123;</div><div class="line">          msg.setAsynchronous(true);</div><div class="line">      &#125;</div><div class="line">      return queue.enqueueMessage(msg, uptimeMillis);</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>调用到MessageQueue里面的方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">boolean enqueueMessage(Message msg, long when) &#123;</div><div class="line">        if (msg.target == null) &#123;</div><div class="line">            throw new IllegalArgumentException(&quot;Message must have a target.&quot;);</div><div class="line">        &#125;</div><div class="line">        if (msg.isInUse()) &#123;</div><div class="line">            throw new IllegalStateException(msg + &quot; This message is already in use.&quot;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        synchronized (this) &#123;</div><div class="line">            if (mQuitting) &#123;</div><div class="line">                IllegalStateException e = new IllegalStateException(</div><div class="line">                        msg.target + &quot; sending message to a Handler on a dead thread&quot;);</div><div class="line">                Log.w(TAG, e.getMessage(), e);</div><div class="line">                msg.recycle();</div><div class="line">                return false;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            msg.markInUse();</div><div class="line">            msg.when = when;</div><div class="line">            Message p = mMessages;</div><div class="line">            boolean needWake;</div><div class="line">            //消息队列中的第一个消息</div><div class="line">            if (p == null || when == 0 || when &lt; p.when) &#123;</div><div class="line">                // New head, wake up the event queue if blocked.</div><div class="line">                msg.next = p;</div><div class="line">                mMessages = msg;</div><div class="line">                needWake = mBlocked;</div><div class="line">            &#125; else &#123;</div><div class="line">                // Inserted within the middle of the queue.  Usually we don&apos;t have to wake</div><div class="line">                // up the event queue unless there is a barrier at the head of the queue</div><div class="line">                // and the message is the earliest asynchronous message in the queue.</div><div class="line">                needWake = mBlocked &amp;&amp; p.target == null &amp;&amp; msg.isAsynchronous();</div><div class="line">                Message prev;</div><div class="line">                //根据指定的时间，把消息放在合适的位置</div><div class="line">                for (;;) &#123;</div><div class="line">                    prev = p;</div><div class="line">                    p = p.next;</div><div class="line">                    if (p == null || when &lt; p.when) &#123;</div><div class="line">                        break;</div><div class="line">                    &#125;</div><div class="line">                    if (needWake &amp;&amp; p.isAsynchronous()) &#123;</div><div class="line">                        needWake = false;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                msg.next = p; // invariant: p == prev.next</div><div class="line">                prev.next = msg;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            // We can assume mPtr != 0 because mQuitting is false.</div><div class="line">            </div><div class="line">            //放入消息后，出发消息读取</div><div class="line">            if (needWake) &#123;</div><div class="line">                nativeWake(mPtr);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        return true;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>最终处理消息的地方是在Looper中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">    * Run the message queue in this thread. Be sure to call</div><div class="line">    * &#123;@link #quit()&#125; to end the loop.</div><div class="line">    */</div><div class="line">   public static void loop() &#123;</div><div class="line">       final Looper me = myLooper();</div><div class="line">       if (me == null) &#123;</div><div class="line">           throw new RuntimeException(&quot;No Looper; Looper.prepare() wasn&apos;t called on this thread.&quot;);</div><div class="line">       &#125;</div><div class="line">       final MessageQueue queue = me.mQueue;</div><div class="line"></div><div class="line">       // Make sure the identity of this thread is that of the local process,</div><div class="line">       // and keep track of what that identity token actually is.</div><div class="line">       Binder.clearCallingIdentity();</div><div class="line">       final long ident = Binder.clearCallingIdentity();</div><div class="line"></div><div class="line">       //开启一个死循环</div><div class="line">       for (;;) &#123;</div><div class="line">       </div><div class="line">          //从消息队列中读取消息（如果没有，则阻塞当前的线程）</div><div class="line">           Message msg = queue.next(); // might block</div><div class="line">           if (msg == null) &#123;</div><div class="line">               // No message indicates that the message queue is quitting.</div><div class="line">               return;</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           // This must be in a local variable, in case a UI event sets the logger</div><div class="line">           final Printer logging = me.mLogging;</div><div class="line">           if (logging != null) &#123;</div><div class="line">               logging.println(&quot;&gt;&gt;&gt;&gt;&gt; Dispatching to &quot; + msg.target + &quot; &quot; +</div><div class="line">                       msg.callback + &quot;: &quot; + msg.what);</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           final long slowDispatchThresholdMs = me.mSlowDispatchThresholdMs;</div><div class="line"></div><div class="line">           final long traceTag = me.mTraceTag;</div><div class="line">           if (traceTag != 0 &amp;&amp; Trace.isTagEnabled(traceTag)) &#123;</div><div class="line">               Trace.traceBegin(traceTag, msg.target.getTraceName(msg));</div><div class="line">           &#125;</div><div class="line">           final long start = (slowDispatchThresholdMs == 0) ? 0 : SystemClock.uptimeMillis();</div><div class="line">           final long end;</div><div class="line">           try &#123;</div><div class="line">               //从队列中获取到消息，分发消息</div><div class="line">               msg.target.dispatchMessage(msg);</div><div class="line">               end = (slowDispatchThresholdMs == 0) ? 0 : SystemClock.uptimeMillis();</div><div class="line">           &#125; finally &#123;</div><div class="line">               if (traceTag != 0) &#123;</div><div class="line">                   Trace.traceEnd(traceTag);</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line">           if (slowDispatchThresholdMs &gt; 0) &#123;</div><div class="line">               final long time = end - start;</div><div class="line">               if (time &gt; slowDispatchThresholdMs) &#123;</div><div class="line">                   Slog.w(TAG, &quot;Dispatch took &quot; + time + &quot;ms on &quot;</div><div class="line">                           + Thread.currentThread().getName() + &quot;, h=&quot; +</div><div class="line">                           msg.target + &quot; cb=&quot; + msg.callback + &quot; msg=&quot; + msg.what);</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           if (logging != null) &#123;</div><div class="line">               logging.println(&quot;&lt;&lt;&lt;&lt;&lt; Finished to &quot; + msg.target + &quot; &quot; + msg.callback);</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           // Make sure that during the course of dispatching the</div><div class="line">           // identity of the thread wasn&apos;t corrupted.</div><div class="line">           final long newIdent = Binder.clearCallingIdentity();</div><div class="line">           if (ident != newIdent) &#123;</div><div class="line">               Log.wtf(TAG, &quot;Thread identity changed from 0x&quot;</div><div class="line">                       + Long.toHexString(ident) + &quot; to 0x&quot;</div><div class="line">                       + Long.toHexString(newIdent) + &quot; while dispatching to &quot;</div><div class="line">                       + msg.target.getClass().getName() + &quot; &quot;</div><div class="line">                       + msg.callback + &quot; what=&quot; + msg.what);</div><div class="line">           &#125;</div><div class="line">           //回收消息</div><div class="line">           msg.recycleUnchecked();</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>处理消息的地方（是有优先级的）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * Handle system messages here.</div><div class="line"> */</div><div class="line">public void dispatchMessage(Message msg) &#123;</div><div class="line">    //优先调用msg自带的回调（postMessage(Runnable 就是回调)）</div><div class="line">    if (msg.callback != null) &#123;</div><div class="line">        handleCallback(msg);</div><div class="line">    &#125; else &#123;</div><div class="line">        //Handler初始化时候的回调</div><div class="line">        if (mCallback != null) &#123;</div><div class="line">            if (mCallback.handleMessage(msg)) &#123;</div><div class="line">                return;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        //自带的方法回调</div><div class="line">        handleMessage(msg);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Looper保存在什么地方"><a href="#Looper保存在什么地方" class="headerlink" title="Looper保存在什么地方"></a>Looper保存在什么地方</h3><p>Looper保存在TLS中，Thread Local Storage ，对于ThreadLocal</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//这是Looper类的静态变量，类似一个工具类</div><div class="line">// sThreadLocal.get() will return null unless you&apos;ve called prepare().</div><div class="line">   static final ThreadLocal&lt;Looper&gt; sThreadLocal = new ThreadLocal&lt;Looper&gt;();</div></pre></td></tr></table></figure>
+<p>当调用prepare的时候：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">private static void prepare(boolean quitAllowed) &#123;</div><div class="line">      //如果当前线程已经有一个looper，则直接报异常</div><div class="line">      if (sThreadLocal.get() != null) &#123;</div><div class="line">          throw new RuntimeException(&quot;Only one Looper may be created per thread&quot;);</div><div class="line">      &#125;</div><div class="line">      //创建一个looper对象，设置进去</div><div class="line">      sThreadLocal.set(new Looper(quitAllowed));</div><div class="line">  &#125;</div><div class="line"></div><div class="line"> private Looper(boolean quitAllowed) &#123;</div><div class="line">      mQueue = new MessageQueue(quitAllowed);</div><div class="line">      mThread = Thread.currentThread();</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>看下ThreadLocal：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">public void set(T value) &#123;</div><div class="line">       //拿到当前的线程</div><div class="line">       Thread t = Thread.currentThread();</div><div class="line">       </div><div class="line">       //以当前线程的作为key，或者map</div><div class="line">       ThreadLocalMap map = getMap(t);</div><div class="line">       </div><div class="line">       //更新或者设置入值</div><div class="line">       if (map != null)</div><div class="line">           map.set(this, value);</div><div class="line">       else</div><div class="line">           createMap(t, value);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   public T get() &#123;</div><div class="line">       Thread t = Thread.currentThread();</div><div class="line">       ThreadLocalMap map = getMap(t);</div><div class="line">       if (map != null) &#123;</div><div class="line">           ThreadLocalMap.Entry e = map.getEntry(this);</div><div class="line">           if (e != null) &#123;</div><div class="line">               @SuppressWarnings(&quot;unchecked&quot;)</div><div class="line">               T result = (T)e.value;</div><div class="line">               return result;</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       return setInitialValue();</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>由此可见每一个线程都有一个独立的   Looper，互相都不冲突！</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/30/2017-8-30-andrew-1/" class="archive-article-date">
-  	<time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/30/2017-8-30-andrew-1/">神经网络(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -500,180 +213,125 @@ var _hmt = _hmt || [];
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/深度学习/" class="article-tag-list-link color5">深度学习</a>
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
         		</li>
       		
 		</ul>
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2018/03/22/Handler详解/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/29/2017-8-29-md-1/" class="archive-article-date">
-  	<time datetime="2017-08-28T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-29</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2018/03/20/Android Binder机制-3(ServiceManager)/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Binder-3 (ServiceManager)</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/29/2017-8-29-md-1/">Android Material Design(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/MD/" class="article-tag-list-link color3">MD</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/28/2017-8-28-tensor-flow-2/" class="archive-article-date">
-  	<time datetime="2017-08-27T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-28</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/28/2017-8-28-tensor-flow-2/">算法和数理统计(1)</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/算法和数理统计/" class="article-tag-list-link color3">算法和数理统计</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/22/2017-8-22-tensor-flow-1/" class="archive-article-date">
-  	<time datetime="2017-08-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/22/2017-8-22-tensor-flow-1/">TensorFlow学习笔记(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/AI/" class="article-tag-list-link color3">AI</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
+  
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script>
+  var cloudTieConfig = {
+    url: "http://yoursite.com/2018/03/22/Handler详解/", 
+    sourceId: "Handler详解",
+    productKey: "true",
+    target: "cloud-tie-wrapper"
+  };
+</script>
+<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
   
 
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="extend next" rel="next" href="/archives/page/2/">Next &raquo;</a>
-    </nav>
+  
+
   
 
 
@@ -697,8 +355,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

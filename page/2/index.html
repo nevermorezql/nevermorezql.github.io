@@ -157,6 +157,665 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-2017-8-17-view-4" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/17/2017-8-17-view-4/">View绘制学习笔记(4)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/17/2017-8-17-view-4/" class="archive-article-date">
+  	<time datetime="2017-08-16T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="绘制转换"><a href="#绘制转换" class="headerlink" title="绘制转换"></a>绘制转换</h1><h2 id="范围裁切"><a href="#范围裁切" class="headerlink" title="范围裁切"></a>范围裁切</h2><p>canvas的方法，除了该范围之外的所有图形都会忽略</p>
+<ol>
+<li>clipRect()<br>canvas.clipRect(left, top, right, bottom);  </li>
+<li>clipPath()<br> 效果等同于clipRect ，只是定义的范围不同</li>
+<li>如果多个clipXXX ，则计算重合的部分，如果没有重合的部分，则全部都绘制不出来</li>
+</ol>
+<h2 id="几何变换"><a href="#几何变换" class="headerlink" title="几何变换"></a>几何变换</h2><h3 id="使用-Canvas-来做常见的二维变换-画布的变动"><a href="#使用-Canvas-来做常见的二维变换-画布的变动" class="headerlink" title="使用 Canvas 来做常见的二维变换[画布的变动]"></a>使用 Canvas 来做常见的二维变换[画布的变动]</h3><ol>
+<li>Canvas.translate(float dx, float dy) 平移<ul>
+<li>dx 和 dy 分别指水平和垂直 方向移动的距离 </li>
+</ul>
+</li>
+<li>Canvas.rotate(float degrees, float px, float py) 旋转<ul>
+<li>参数里的 degrees 是旋转角度，单位是度（也就是一周有 360° 的那个单位），方向是顺时针为正向； px 和 py 是轴心的位置。</li>
+</ul>
+</li>
+<li>Canvas.scale(float sx, float sy, float px, float py) 放缩<ul>
+<li>参数里的 sx sy 是横向和纵向的放缩倍数； px py 是放缩的轴心。 这里是整个画布都会放大，接下来所有的单位都会被放大，不管是移动的距离，还是图形本身的大小，一般来说 需要放大某一个图片时，需要把放缩的轴心移动到该图形的坐标点</li>
+</ul>
+</li>
+<li>Canvas.skew(float sx, float sy) 错切<ul>
+<li>参数里的 sx 和 sy 是 x 方向和 y 方向的错切系数。</li>
+</ul>
+</li>
+</ol>
+<h3 id="使用-Matrix-来做常见和不常见的二维变换"><a href="#使用-Matrix-来做常见和不常见的二维变换" class="headerlink" title="使用 Matrix 来做常见和不常见的二维变换"></a>使用 Matrix 来做常见和不常见的二维变换</h3><p>Canvas提供的四种变换方法都是基于Matrix实现的,Matrix 本质上定义了每一个点的偏移距离<br>Matrix.setPolyToPoly(float[] src, int srcIndex, float[] dst, int dstIndex, int pointCount) 用点对点映射的方式设置变换</p>
+<ul>
+<li>src 和 dst 分别代表原始点和目标点的集合</li>
+<li>setPolyToPoly() 的作用是通过多点的映射的方式来直接设置变换。「多点映射」的意思就是把指定的点移动到给出的位置，从而发生形变。例如：(0, 0) -&gt; (100, 100) 表示把 (0, 0) 位置的像素移动到 (100, 100) 的位置，这个是单点的映射，单点映射可以实现平移。而多点的映射，就可以让绘制内容任意地扭曲。</li>
+</ul>
+<h3 id="使用-Camera-来做三维变换"><a href="#使用-Camera-来做三维变换" class="headerlink" title="使用 Camera 来做三维变换"></a>使用 Camera 来做三维变换</h3><ol>
+<li>Camera 的坐标系 跟 Canvas坐标对比<br> Camera 三维坐标–z轴，屏幕向外是正，越大图形越小<br> Y向上为正<br> X向右为正</li>
+<li>Camera 的三维变换有三类：旋转、平移、移动相机。<ul>
+<li>Camera.rotate*() 三维旋转<ul>
+<li>rotateX(deg) rotateY(deg) rotateZ(deg) rotate(x, y, z)   </li>
+</ul>
+</li>
+<li>Camera.translate(float x, float y, float z) 移动 </li>
+<li>Camera.setLocation(x, y, z) 设置虚拟相机的位置</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line">  private void init() &#123;</div><div class="line">        bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.cat);</div><div class="line">        width = bitmap.getWidth();</div><div class="line">        height = bitmap.getHeight();</div><div class="line">        paint = new Paint();</div><div class="line">        circlePath = new Path();</div><div class="line">        circlePath.addCircle(200, 200, 100, Path.Direction.CCW);</div><div class="line">        smallBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.small_cat);</div><div class="line">        smallWidth = smallBitmap.getWidth();</div><div class="line">        smallHeight = smallBitmap.getHeight();</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDraw(Canvas canvas) &#123;</div><div class="line">        super.onDraw(canvas);</div><div class="line"></div><div class="line">        //裁剪</div><div class="line">//        canvas.save();</div><div class="line">//        canvas.clipPath(circlePath);</div><div class="line">//        canvas.drawBitmap(bitmap, 100, 100, paint);</div><div class="line">//        canvas.restore();</div><div class="line">//</div><div class="line">//        //canvas 变换 【是旋转画布的坐标系】</div><div class="line">//        canvas.save();</div><div class="line">//        canvas.rotate(45, 400, 100);</div><div class="line">//        canvas.drawBitmap(smallBitmap, 400, 100, paint);</div><div class="line">//        canvas.restore();</div><div class="line">//</div><div class="line">//        // 错切 -- 绘制一个 -- X或者Y的坐标进行偏移 -- x增大，就是向右错切 -- x 变小就是向左错切</div><div class="line">//        // y变大 向下错切 ，y变小 向上错切</div><div class="line">//        //scal 放大缩小 -- x和y的坐标的大放大和缩小</div><div class="line">//        //逆序---一定要注意</div><div class="line">//        canvas.save();</div><div class="line">//        canvas.scale(1.5f, 1.5f);</div><div class="line">//        canvas.skew(-0.8f, 0);</div><div class="line">//        canvas.drawBitmap(smallBitmap, 700, 100, paint);</div><div class="line">//        canvas.restore();</div><div class="line">//</div><div class="line">//        //Matrix 变换</div><div class="line">//        canvas.drawBitmap(smallBitmap, 100, 600, paint);</div><div class="line">//</div><div class="line">//        float[] src = &#123;100, 600 + smallHeight / 2, 100 + smallWidth, smallHeight / 2 + 600, 100, 600 + smallHeight, 100 + smallWidth, 600 + smallHeight&#125;;</div><div class="line">//        float[] dest = &#123;100, 600 + smallHeight / 2, 100 + smallWidth, smallHeight / 2 + 600, 0, 600 + smallHeight, smallWidth, 600 + smallHeight&#125;;</div><div class="line">//        Matrix matrix = new Matrix();</div><div class="line">//        matrix.setPolyToPoly(src, 0, dest, 0, 4);</div><div class="line">//        canvas.save();</div><div class="line">//        canvas.setMatrix(matrix);</div><div class="line">//        canvas.drawBitmap(smallBitmap, 500, 600, paint);</div><div class="line">//        canvas.restore();</div><div class="line"></div><div class="line">        //Camera 用法</div><div class="line">        Camera camera = new Camera();</div><div class="line">        canvas.save();</div><div class="line">        canvas.translate(500, 600);</div><div class="line">        camera.save();</div><div class="line">        camera.rotateX(45);</div><div class="line">//        camera.translate(0, 0, -300);</div><div class="line">        camera.applyToCanvas(canvas);</div><div class="line">        camera.restore();</div><div class="line">        canvas.translate(-500, -600);</div><div class="line">        canvas.drawBitmap(smallBitmap, 500, 600, paint);</div><div class="line">        canvas.restore();</div><div class="line"></div><div class="line">        //移动camera</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/17/2017-8-17-view-4/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-2017-8-14-view-3" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/16/2017-8-14-view-3/">View绘制学习笔记(3)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/16/2017-8-14-view-3/" class="archive-article-date">
+  	<time datetime="2017-08-15T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Canvas-绘制文字"><a href="#Canvas-绘制文字" class="headerlink" title="Canvas 绘制文字"></a>Canvas 绘制文字</h1><h2 id="Canvas-的文字绘制方法有三个："><a href="#Canvas-的文字绘制方法有三个：" class="headerlink" title="Canvas 的文字绘制方法有三个："></a>Canvas 的文字绘制方法有三个：</h2><h3 id="1-drawText-String-text-float-x-float-y-Paint-paint"><a href="#1-drawText-String-text-float-x-float-y-Paint-paint" class="headerlink" title="1.  drawText(String text, float x, float y, Paint paint)"></a>1.  drawText(String text, float x, float y, Paint paint)</h3><p>   y为文字的基线，x为左边一点点 </p>
+<h3 id="2-drawTextRun"><a href="#2-drawTextRun" class="headerlink" title="2. drawTextRun()"></a>2. drawTextRun()</h3><p>start end 和 contextStart contextEnd 必须对应<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">drawTextRun(CharSequence text, int start, int end, int contextStart, int contextEnd, float x, float y, boolean isRtl, Paint paint)</div><div class="line">参数：</div><div class="line">text：要绘制的文字</div><div class="line">start：从那个字开始绘制</div><div class="line">end：绘制到哪个字结束</div><div class="line">contextStart：上下文的起始位置。contextStart 需要小于等于 start</div><div class="line">contextEnd：上下文的结束位置。contextEnd 需要大于等于 end</div><div class="line">x：文字左边的坐标</div><div class="line">y：文字的基线坐标</div><div class="line">isRtl：是否是 RTL（Right-To-Left，从右向左）</div></pre></td></tr></table></figure></p>
+<h3 id="3-drawTextOnPath"><a href="#3-drawTextOnPath" class="headerlink" title="3. drawTextOnPath()"></a>3. drawTextOnPath()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">drawTextOnPath(String text, Path path, float hOffset, float vOffset, Paint paint)</div><div class="line">路径绘制文字， hOffset,vOffset -&gt; 文字相对于 Path 的水平偏移量和竖直偏移量</div></pre></td></tr></table></figure>
+<h3 id="4-StaticLayout"><a href="#4-StaticLayout" class="headerlink" title="4. StaticLayout"></a>4. StaticLayout</h3><p>注意TextPaint 需要提前设置好参数再设置到StaticLayout里面去，否则绘制会线按照默认自定绘制，然后再放大字体，达不到预期的效果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">StaticLayout 的构造方法是 StaticLayout(CharSequence source, TextPaint paint, int width, Layout.Alignment align, float spacingmult, float spacingadd, boolean includepad)，其中参数里：</div><div class="line">width 是文字区域的宽度，文字到达这个宽度后就会自动换行；</div><div class="line">align 是文字的对齐方向；</div><div class="line">spacingmult 是行间距的倍数，通常情况下填 1 就好；</div><div class="line">spacingadd 是行间距的额外增加值，通常情况下填 0 就好；</div><div class="line">includeadd 是指是否在文字上下添加额外的空间，来避免某些过高的字符的绘制出现越界</div></pre></td></tr></table></figure></p>
+<h1 id="Paint-对文字绘制的辅助"><a href="#Paint-对文字绘制的辅助" class="headerlink" title="Paint 对文字绘制的辅助"></a>Paint 对文字绘制的辅助</h1><p>Paint 对文字绘制的辅助，有两类方法：设置显示效果的和测量文字尺寸的。</p>
+<h3 id="设置显示效果类"><a href="#设置显示效果类" class="headerlink" title="设置显示效果类"></a>设置显示效果类</h3><ol>
+<li>setTextSize(float textSize) 设置字体大小</li>
+<li>setTypeface(Typeface typeface) // Typeface.createFromAsset</li>
+<li>setFakeBoldText(boolean fakeBoldText)    <ul>
+<li>伪粗体（ fake bold ），因为它并不是通过选用更高 weight 的字体让文字变粗，而是通过程序在运行时把文字给「描粗」了</li>
+</ul>
+</li>
+<li>setStrikeThruText(boolean strikeThruText) 删除线。</li>
+<li>setUnderlineText(boolean underlineText)  下划线</li>
+<li>setTextSkewX(float skewX) 设置文字横向错切角度。其实就是文字倾斜度的啦。</li>
+<li>setTextScaleX(float scaleX) 设置文字横向放缩。也就是文字变胖变瘦。</li>
+<li>setLetterSpacing(float letterSpacing) 设置字符间距。默认值是 0。</li>
+<li>setFontFeatureSettings(String settings) 用 CSS 的 font-feature-settings 的方式来设置文字</li>
+<li>setTextAlign(Paint.Align align) 置文字的对齐方式。一共有三个值：LEFT CETNER 和 RIGHT。默认值为 LEFT。</li>
+<li>setTextLocale(Locale locale) / setTextLocales(LocaleList locales)</li>
+<li>setHinting(int mode) 字体微调 – 目前高像素几乎没什么用，在于矢量字体缩小的时候，显示问题</li>
+<li>setElegantTextHeight(boolean elegant) 特与的语种，某些字体会特别的高，加上这个就会使用原始的字体</li>
+<li>setSubpixelText(boolean subpixelText) 是否开启次像素级的抗锯齿 现在基本没用</li>
+<li>setLinearText(boolean linearText)<br>设置是否打开线性文本标识，这玩意对大多数人来说都很奇怪不知道这玩意什么意思。想要明白这东西你要先知道文本在Android中是如何进行存储和计算的。在Android中文本的绘制需要使用一个bitmap作为单个字符的缓存，既然是缓存必定要使用一定的空间，我们可以通过setLinearText (true)告诉Android我们不需要这样的文本缓存。</li>
+</ol>
+<h3 id="测量文字尺寸类"><a href="#测量文字尺寸类" class="headerlink" title="测量文字尺寸类"></a>测量文字尺寸类</h3><ol>
+<li>float getFontSpacing() 获取推荐的行距-&gt; 推荐的两行文字的 baseline 的距离</li>
+<li>FontMetircs getFontMetrics() -&gt; top, ascent, baseline, descent, bottom,leading<br><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/metric_font.jpg" alt="image"><ul>
+<li>baseline 基线</li>
+<li>ascent,decent 普通文字的上下沿</li>
+<li>top,bottom 全部文字的上下沿</li>
+<li>leading 上一行的bottom和下一行的top之间的间距</li>
+<li>getFontSpacing() &lt; top - bottom + leading<br>因为getFontSpacing会在文字不是很紧凑的情况下，尽量的缩小间距，这样效果更好，一般使用getFontSpacing</li>
+</ul>
+</li>
+<li>getTextBounds(String text, int start, int end, Rect bounds) 获取文字的显示范围。— 文字真正的绘制范围</li>
+<li>float measureText(String text) 测量文字的宽度并返回。<br> 一般来说measureText 得出的结果会比 getTextBounds 大一点，是因为measureText 是文字的宽度，文字左边和右边 一般会加一点间距</li>
+<li>getTextWidths(String text, float[] widths) 每个字符的宽度，效果跟measureText一样</li>
+<li><p>int breakText(String text, boolean measureForwards, float maxWidth, float[] measuredWidth)</p>
+<ul>
+<li>breakText() 的返回值是截取的文字个数（如果宽度没有超限，则是文字的总个数）。参数中， text 是要测量的文字；measureForwards 表示文字的测量方向，true 表示由左往右测量；maxWidth 是给出的宽度上限；measuredWidth 是用于接受数据，而不是用于提供数据的：方法测量完成后会把截取的文字宽度（如果宽度没有超限，则为文字总宽度）赋值给 measuredWidth[0]。</li>
+</ul>
+</li>
+<li><p>光标相关</p>
+<ul>
+<li>对于 EditText 以及类似的场景，会需要绘制光标。光标的计算很麻烦，不过 API 23 引入了两个新的方法，有了这两个方法后，计算光标就方便了很多。 </li>
+<li>getRunAdvance(CharSequence text, int start, int end, int contextStart, int contextEnd, boolean isRtl, int offset)<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">int length = text.length();</div><div class="line">float advance = paint.getRunAdvance(text, 0, length, 0, length, false, length);</div><div class="line">canvas.drawText(text, offsetX, offsetY, paint);</div><div class="line">canvas.drawLine(offsetX + advance, offsetY - 50, offsetX + advance, offsetY + 10, paint);</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<p>在只有文字的情况下，跟measureText效果一致，但是当包含 emoji表情时，得出的结果就不同了，</p>
+<pre><code>* getOffsetForAdvance(CharSequence text, int start, int end, int contextStart, int contextEnd, boolean isRtl, float advance)
+方法的参数很简单： text 是要测量的文字；start end 是文字的起始和结束坐标；contextStart contextEnd 是上下文的起始和结束坐标；isRtl 是文字方向；advance是给出的位置的像素值。填入参数，对应的字符偏移量将作为返回值返回。
+**getOffsetForAdvance() 配合上 getRunAdvance() 一起使用，就可以实现「获取用户点击处的文字坐标」的需求。**
+</code></pre><ol>
+<li>hasGlyph(String string) 检查指定的字符串中是否是一个单独的字形 (glyph）。最简单的情况是，string 只有一个字母（比如 a）。<br> <img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/has_glyph.jpg" alt="image"></li>
+</ol>
+<p><strong>Code</strong>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line">private String content = &quot;周一诺是个胖子&quot;;</div><div class="line">   private String content2 = &quot;عربى&quot;;</div><div class="line">   private String content3 = &quot;zhou yi nuo shi ge pang zi,zhou yi nuo shi ge pang&quot;;</div><div class="line">   private String content4 = &quot;zhou yi nuo shi ge pang zi&quot;;</div><div class="line">   private String content5 = &quot;我是一个瘦子&quot;;</div><div class="line">   private String content6 = &quot;插入的文字&quot;;</div><div class="line">   private Paint paint;</div><div class="line">   private Path path;</div><div class="line"></div><div class="line">   public TextOnly(Context context) &#123;</div><div class="line">       super(context);</div><div class="line">       init();</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   public TextOnly(Context context, @Nullable AttributeSet attrs) &#123;</div><div class="line">       super(context, attrs);</div><div class="line">       init();</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   public TextOnly(Context context, @Nullable AttributeSet attrs, int defStyleAttr) &#123;</div><div class="line">       super(context, attrs, defStyleAttr);</div><div class="line">       init();</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   private void init() &#123;</div><div class="line">       paint = new Paint();</div><div class="line">       paint.setTextSize(50);</div><div class="line">       paint.setStyle(Paint.Style.STROKE);</div><div class="line">       path = new Path();</div><div class="line">       path.moveTo(0, 300);</div><div class="line">       path.rLineTo(100, 200);</div><div class="line">       path.rLineTo(200, -200);</div><div class="line">       path.rLineTo(200, 300);</div><div class="line">       path.rLineTo(100, -100);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">   protected void onDraw(Canvas canvas) &#123;</div><div class="line">       super.onDraw(canvas);</div><div class="line">       paint.reset();</div><div class="line">       paint.setStyle(Paint.Style.STROKE);</div><div class="line">       paint.setTextSize(60);</div><div class="line">       canvas.drawText(content.substring(0, 3), 0, 100, paint);</div><div class="line">       paint.setColor(Color.RED);</div><div class="line">       canvas.drawText(content6, paint.measureText(content.substring(0, 3)), 100, paint);</div><div class="line">       paint.setColor(Color.BLACK);</div><div class="line">       canvas.drawText(content.substring(3), paint.measureText(content.substring(0, 3)) + paint.measureText(content6), 100, paint);</div><div class="line"></div><div class="line">       paint.setTextSize(60);</div><div class="line">       canvas.drawText(content5, 0, 100 + paint.getFontSpacing(), paint);</div><div class="line"></div><div class="line">       canvas.drawTextRun(content2, 0, content2.length(), 0, content2.length(), 0, 200, true, paint);</div><div class="line">       canvas.drawPath(path, paint);</div><div class="line"></div><div class="line">       paint.setTextSize(50);</div><div class="line">       paint.setPathEffect(new CornerPathEffect(20));</div><div class="line">       canvas.drawTextOnPath(content.concat(content).concat(content), path, 10, 10, paint);</div><div class="line"></div><div class="line">       TextPaint textPaint = new TextPaint();</div><div class="line">       textPaint.setTextSize(50);</div><div class="line">       StaticLayout staticLayout = new StaticLayout(content3, textPaint, 300, Layout.Alignment.ALIGN_NORMAL, 1, 0, true);</div><div class="line"></div><div class="line">       canvas.save();</div><div class="line">       canvas.translate(0, 500);</div><div class="line">       staticLayout.draw(canvas);</div><div class="line">       canvas.restore();</div><div class="line"></div><div class="line">       paint.reset();</div><div class="line">       paint.setStyle(Paint.Style.STROKE);</div><div class="line">       paint.setTextSize(60);</div><div class="line">       paint.setTypeface(Typeface.createFromAsset(getResources().getAssets(), &quot;BrannbollFet.ttf&quot;));</div><div class="line">       canvas.drawText(content4, 0, 1200, paint);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>效果图：<br><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/text.png" alt="image"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/16/2017-8-14-view-3/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-2017-8-14-view-2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/14/2017-8-14-view-2/">View绘制学习笔记(2)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/14/2017-8-14-view-2/" class="archive-article-date">
+  	<time datetime="2017-08-14T04:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Paint-详解"><a href="#Paint-详解" class="headerlink" title="Paint 详解"></a>Paint 详解</h1><p><strong>主要是方法的介绍，了解</strong><br>Paint 的 API 大致可以分为 4 类</p>
+<ul>
+<li>颜色</li>
+<li>效果</li>
+<li>drawText() 相关</li>
+<li>初始化</li>
+</ul>
+<h1 id="颜色"><a href="#颜色" class="headerlink" title="颜色"></a>颜色</h1><ol>
+<li>通过Canvas 直接绘制颜色 drawColor/RGB/ARGB()</li>
+<li>通过Paint setColor or setARGB</li>
+<li><p>通过Paint setShader </p>
+<ul>
+<li><p>LinearGradient 线性变换，主要针对颜色</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">// 定义两个点之间颜色的线性变换</div><div class="line"> LinearGradient linearGradient = new LinearGradient(startX, startY, endX, endY, Color.parseColor(&quot;#FF00FFFF&quot;), Color.parseColor(&quot;#55FFFF00&quot;), Shader.TileMode.CLAMP);</div></pre></td></tr></table></figure>
+</li>
+<li><p>RadialGradient 圆形扩散 参数可以参照API</p>
+</li>
+<li>SweepGradient 弧形扩散 </li>
+<li>BitmapShader 图片像素作色</li>
+<li>ComposeShader 多个Shader组合</li>
+</ul>
+</li>
+<li><p>TileMode 有三种—  CLAMP, MIRROR 和 REPEAT</p>
+<ul>
+<li>CLAMP 顶点的颜色延伸</li>
+<li>MIRROR 超出部分的颜色 镜像</li>
+<li>REPEAT 超出的范围，重复</li>
+</ul>
+</li>
+<li><p>PorterDuff.Mode 有17种(混合大概了解一下)</p>
+<ul>
+<li>第一类，Alpha 合成，其实就是 「PorterDuff」 这个词所指代的算法。 「PorterDuff」 并不是一个具有实际意义的词组，而是两个人的名字（准确讲是姓）。这两个人当年共同发表了一篇论文，描述了 12 种将两个图像共同绘制的操作（即算法）。而这篇论文所论述的操作，都是关于 Alpha 通道（也就是我们通俗理解的「透明度」）的计算的，后来人们就把这类计算称为Alpha 合成 ( Alpha Compositing ) 。</li>
+<li>第二类，混合，也就是 Photoshop 等制图软件里都有的那些混合模式（multiplydarken lighten 之类的）。这一类操作的是颜色本身而不是 Alpha 通道，并不属于 Alpha 合成，所以和 Porter 与 Duff 这两个人也没什么关系，不过为了使用的方便，它们同样也被 Google 加进了 PorterDuff.Mode 里。</li>
+</ul>
+</li>
+</ol>
+<p><strong>Code:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">private void init() &#123;</div><div class="line">        LinearGradient linearGradient = new LinearGradient(startX, startY, endX, endY, Color.parseColor(&quot;#FF00FFFF&quot;), Color.parseColor(&quot;#55FFFF00&quot;), Shader.TileMode.CLAMP);</div><div class="line">        paint = new Paint();</div><div class="line">        paint.setShader(linearGradient);</div><div class="line"></div><div class="line">        RadialGradient radialGradient = new RadialGradient(750, 250, 250, Color.parseColor(&quot;#00000000&quot;), Color.parseColor(&quot;#FF000000&quot;), Shader.TileMode.CLAMP);</div><div class="line">        radialPaint = new Paint();</div><div class="line">        radialPaint.setShader(radialGradient);</div><div class="line"></div><div class="line">        SweepGradient sweepGradient = new SweepGradient(250, 750, Color.parseColor(&quot;#00000000&quot;), Color.parseColor(&quot;#FF000000&quot;));</div><div class="line">        sweepPaint = new Paint();</div><div class="line">        sweepPaint.setShader(sweepGradient);</div><div class="line"></div><div class="line">        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.cat);</div><div class="line">        BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);</div><div class="line">        bitmapPaint = new Paint();</div><div class="line">        bitmapPaint.setShader(bitmapShader);</div><div class="line"></div><div class="line">        composePaint = new Paint();</div><div class="line">        ComposeShader composeShader = new ComposeShader(linearGradient, bitmapShader, PorterDuff.Mode.SRC_OVER);</div><div class="line">        composePaint.setShader(composeShader);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDraw(Canvas canvas) &#123;</div><div class="line">        super.onDraw(canvas);</div><div class="line">        canvas.drawCircle(250, 250, 250, paint);</div><div class="line">        canvas.drawCircle(750, 250, 250, radialPaint);</div><div class="line">        canvas.drawCircle(250, 750, 250, sweepPaint);</div><div class="line">        canvas.drawCircle(750, 750, 250, bitmapPaint);</div><div class="line">        canvas.drawCircle(1000, 500, 50, composePaint);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p><strong>效果预览:</strong><br><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/shader.png" alt="image"></p>
+<h3 id="setColorFilter-ColorFilter-colorFilter"><a href="#setColorFilter-ColorFilter-colorFilter" class="headerlink" title="setColorFilter(ColorFilter colorFilter)"></a>setColorFilter(ColorFilter colorFilter)</h3><p>在 Paint 里设置 ColorFilter ，使用的是 Paint.setColorFilter(ColorFilter filter)方法。 ColorFilter 并不直接使用，而是使用它的子类。它共有三个子类：</p>
+<ul>
+<li>LightingColorFilter </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">LightingColorFilter 的构造方法是 LightingColorFilter(int mul, int add) ，参数里的 mul 和 add 都是和颜色值格式相同的 int 值，其中 mul 用来和目标像素相乘，add 用来和目标像素相加： </div><div class="line">一个「保持原样」的「基本 LightingColorFilter 」，mul 为 0xffffff，add 为 0x000000（也就是0）</div><div class="line">如果你想去掉原像素中的红色，可以把它的 mul 改为 0x00ffff （红色部分为 0 ） </div><div class="line">如果你想让它的绿色更亮一些，就可以把它的 add 改为 0x003000 （绿色部分为 0x30）</div></pre></td></tr></table></figure>
+<ul>
+<li><p>PorterDuffColorFilter </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">这个 PorterDuffColorFilter 的作用是使用一个指定的颜色和一种指定的 PorterDuff.Mode来与绘制对象进行合成。它的构造方法是 PorterDuffColorFilter(int color, PorterDuff.Mode mode) 其中的 color 参数是指定的颜色， mode 参数是指定的 Mode。</div><div class="line">设置了没有效果，需要深入研究下PorterDuff</div></pre></td></tr></table></figure>
+</li>
+<li><p>ColorMatrixColorFilter</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ColorMatrixColorFilter 使用一个 ColorMatrix 来对颜色进行处理。 ColorMatrix 这个类，内部是一个 4x5 的矩阵：</div><div class="line"></div><div class="line">[ a, b, c, d, e,</div><div class="line">  f, g, h, i, j,</div><div class="line">  k, l, m, n, o,</div><div class="line">  p, q, r, s, t ]</div><div class="line">通过计算， ColorMatrix 可以把要绘制的像素进行转换。对于颜色 [R, G, B, A] ，转换算法是这样的：</div><div class="line"></div><div class="line">R’ = a*R + b*G + c*B + d*A + e;</div><div class="line">G’ = f*R + g*G + h*B + i*A + j;</div><div class="line">B’ = k*R + l*G + m*B + n*A + o;</div><div class="line">A’ = p*R + q*G + r*B + s*A + t;</div><div class="line">具体如何使用，还需要深入研究</div></pre></td></tr></table></figure>
+<p><strong>效果：</strong><br><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/color_filter.png" alt="image"><br><strong>代码：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">private void init() &#123;</div><div class="line">       lightPaint = new Paint();</div><div class="line">       LightingColorFilter colorFilter = new LightingColorFilter(0x00FFFF, 0x003300);</div><div class="line">       lightPaint.setColorFilter(colorFilter);</div><div class="line">       bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.cat);</div><div class="line">       width = bitmap.getWidth();</div><div class="line">       height = bitmap.getHeight();</div><div class="line">       porterDuffPaint = new Paint();</div><div class="line">       PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(0x888888, PorterDuff.Mode.DARKEN);</div><div class="line">       porterDuffPaint.setColorFilter(porterDuffColorFilter);</div><div class="line">       originalPaint = new Paint();</div><div class="line">       colorMatrixPaint = new Paint();</div><div class="line">       ColorMatrix colorMatrix = new ColorMatrix(matrixArray);</div><div class="line">       ColorMatrixColorFilter colorMatrixColorFilter = new ColorMatrixColorFilter(colorMatrix);</div><div class="line">       colorMatrixPaint.setColorFilter(colorMatrixColorFilter);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">   protected void onDraw(Canvas canvas) &#123;</div><div class="line">       super.onDraw(canvas);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(0, 0, width / 2, height / 2), lightPaint);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(width / 2, 0, width, height / 2), porterDuffPaint);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(width, 0, width * 3 / 2, height / 2), originalPaint);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(0, height / 2, width / 2, height), colorMatrixPaint);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<h3 id="setXfermode-Xfermode-xfermode"><a href="#setXfermode-Xfermode-xfermode" class="headerlink" title="setXfermode(Xfermode xfermode)"></a>setXfermode(Xfermode xfermode)</h3><p>“Xfermode” 其实就是 “Transfer mode”，用 “X” 来代替 “Trans” 是一些美国人喜欢用的简写方式。严谨地讲， Xfermode 指的是你要绘制的内容和 Canvas 的目标位置的内容应该怎样结合计算出最终的颜色。但通俗地说，其实就是要你以绘制的内容作为源图像，以 View 中已有的内容作为目标图像，选取一个 PorterDuff.Mode 作为绘制内容的颜色处理方案。</p>
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><h3 id="1-setAntiAlias-抗锯齿"><a href="#1-setAntiAlias-抗锯齿" class="headerlink" title="1. setAntiAlias 抗锯齿"></a>1. setAntiAlias 抗锯齿</h3><h3 id="2-setStyle-Paint-Style-style"><a href="#2-setStyle-Paint-Style-style" class="headerlink" title="2. setStyle(Paint.Style style)"></a>2. setStyle(Paint.Style style)</h3><pre><code>* FILL 填充
+* STROKE 划线
+* FILL_AND_STROKE 填充+划线
+</code></pre><h3 id="3-线条形状"><a href="#3-线条形状" class="headerlink" title="3. 线条形状"></a>3. 线条形状</h3><pre><code>* setStrokeWidth(float width) 设置线条宽度
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">你可以为 Canvas 设置 Matrix 来实现几何变换（如放大、缩小、平移、旋转），在几何变换之后 Canvas 绘制的内容就会发生相应变化，包括线条也会加粗，例如 2 像素宽度的线条在 Canvas 放大 2 倍后会被以 4 像素宽度来绘制。而当线条宽度被设置为 0 时，它的宽度就被固定为 1 像素，就算 Canvas 通过几何变换被放大，它也依然会被以 1 像素宽度来绘制。Google 在文档中把线条宽度为 0 时称作「hairline mode（发际线模式）」</div></pre></td></tr></table></figure>
+<pre><code>* setStrokeCap(Paint.Cap cap) 
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BUTT 平头(没有多余的部分)、ROUND 圆头(有多余的部分，切位圆形)、SQUARE 方头（有多余的部分，且为方形）。默认为 BUTT。</div></pre></td></tr></table></figure>
+<pre><code>* setStrokeJoin(Paint.Join join)
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">设置拐角的形状。有三个值可以选择：MITER 尖角、 BEVEL 平角和 ROUND 圆角。默认为 MITER。</div></pre></td></tr></table></figure>
+<pre><code>* setStrokeMiter(float miter) 
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">这个方法是对于 setStrokeJoin() 的一个补充，它用于设置 MITER 型拐角的延长线的最大值。所谓「延长线的最大值」</div></pre></td></tr></table></figure>
+<h3 id="4-色彩优化"><a href="#4-色彩优化" class="headerlink" title="4. 色彩优化"></a>4. 色彩优化</h3><p>Paint 的色彩优化有两个方法： setDither(boolean dither) 和 setFilterBitmap(boolean filter) 。它们的作用都是让画面颜色变得更加「顺眼」，但原理和使用场景是不同的。</p>
+<ul>
+<li><p>setDither(boolean dither) 抖动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">抖动的原理和这个类似。所谓抖动（注意，它就叫抖动，不是防抖动，也不是去抖动，有些人在翻译的时候自作主张地加了一个「防」字或者「去」字，这是不对的），是指把图像从较高色彩深度（即可用的颜色数）向较低色彩深度的区域绘制时，在图像中有意地插入噪点，通过有规律地扰乱图像来让图像对于肉眼更加真实的做法。</div></pre></td></tr></table></figure>
+</li>
+<li><p>setFilterBitmap(boolean filter)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">设置是否使用双线性过滤来绘制 Bitmap 。</div><div class="line"></div><div class="line">图像在放大绘制的时候，默认使用的是最近邻插值过滤，这种算法简单，但会出现马赛克现象；而如果开启了双线性过滤，就可以让结果图像显得更加平滑。</div></pre></td></tr></table></figure>
+</li>
+<li><p>setPathEffect(PathEffect effect) </p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PathEffect 分为两类，单一效果的 CornerPathEffect DiscretePathEffect DashPathEffect PathDashPathEffect ，和组合效果的 SumPathEffect ComposePathEffect。</div></pre></td></tr></table></figure>
+<ol>
+<li>DashPathEffect 虚线效果</li>
+<li>CornerPathEffect 折现为圆角</li>
+<li>DiscretePathEffect 随机的上下偏移</li>
+<li>PathDashPathEffect<ul>
+<li>连接的点为自定义Pash </li>
+</ul>
+</li>
+<li>SumPathEffect <ul>
+<li>这是一个组合效果类的 PathEffect 。它的行为特别简单，就是分别按照两种 PathEffect 分别对目标进行绘制。</li>
+</ul>
+</li>
+<li>ComposePathEffect<ul>
+<li>这也是一个组合效果类的 PathEffect 。不过它是先对目标 Path 使用一个 PathEffect，然后再对这个改变后的 Path 使用另一个 PathEffect</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>setShadowLayer(float radius, float dx, float dy, int shadowColor)</p>
+<ul>
+<li>效果就是上面这样。方法的参数里， radius 是阴影的模糊范围； dx dy 是阴影的偏移量； shadowColor 是阴影的颜色。<br>如果要清除阴影层，使用 clearShadowLayer() 。 </li>
+</ul>
+</li>
+<li><p>setMaskFilter(MaskFilter maskfilter)</p>
+<ul>
+<li>为之后的绘制设置 MaskFilter。上一个方法 setShadowLayer() 是设置的在绘制层下方的附加效果；而这个 MaskFilter 和它相反，设置的是在绘制层上方的附加效果。</li>
+<li><p>BlurMaskFilter 模糊效果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">它的构造方法 BlurMaskFilter(float radius, BlurMaskFilter.Blur style) 中， radius 参数是模糊的范围， style 是模糊的类型。一共有四种：</div><div class="line">        NORMAL: 内外都模糊绘制</div><div class="line">        SOLID: 内部正常绘制，外部模糊</div><div class="line">        INNER: 内部模糊，外部不绘制</div><div class="line">        OUTER: 内部不绘制，外部模糊</div></pre></td></tr></table></figure>
+</li>
+<li><p>EmbossMaskFilter 浮雕效果</p>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">它的构造方法 EmbossMaskFilter(float[] direction, float ambient, float specular, float blurRadius) 的参数里， direction 是一个 3 个元素的数组，指定了光源的方向； ambient 是环境光的强度，数值范围是 0 到 1； specular 是炫光的系数； blurRadius 是应用光线的范围。</div></pre></td></tr></table></figure>
+<ul>
+<li>获取绘制的 Path<ul>
+<li>getFillPath(Path src, Path dst) 获取某一个path的实际路径（包含线条等）</li>
+<li>getTextPath(String text, int start, int end, float x, float y, Path path) / getTextPath(char[] text, int index, int count, float x, float y, Path path) 或者文字的实际路径（文字其实也是由各种图形组成的）</li>
+</ul>
+</li>
+</ul>
+<h1 id="drawText-相关"><a href="#drawText-相关" class="headerlink" title="drawText() 相关"></a>drawText() 相关</h1><p> 下一节详细介绍</p>
+<h1 id="初始化类"><a href="#初始化类" class="headerlink" title="初始化类"></a>初始化类</h1><ul>
+<li>reset()<ul>
+<li>重置 Paint 的所有属性为默认值。相当于重新 new 一个，不过性能当然高一些啦。 </li>
+</ul>
+</li>
+<li>set(Paint src)<ul>
+<li>把 src 的所有属性全部复制过来。相当于调用 src 所有的 get 方法，然后调用这个 Paint的对应的 set 方法来设置它们。</li>
+</ul>
+</li>
+<li>setFlags(int flags)<ul>
+<li>paint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG); </li>
+<li>UNDERLINE_TEXT_FLAG</li>
+<li>STRIKE_THRU_TEXT_FLAG</li>
+<li>FAKE_BOLD_TEXT_FLAG</li>
+<li>LINEAR_TEXT_FLAG … 有很多种，很多关于文字的，后面再介绍</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<p><strong>Code</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line">private void init() &#123;</div><div class="line">       paint = new Paint();</div><div class="line">       bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.cat);</div><div class="line">       width = bitmap.getWidth();</div><div class="line">       height = bitmap.getHeight();</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   @Override</div><div class="line">   protected void onDraw(Canvas canvas) &#123;</div><div class="line">       super.onDraw(canvas);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(0, 0, width / 2, height / 2), paint);</div><div class="line">       paint.setDither(true);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(width / 2, 0, width, height / 2), paint);</div><div class="line">       paint.reset();</div><div class="line">       paint.setFilterBitmap(true);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(width, 0, width * 3 / 2, height / 2), paint);</div><div class="line"></div><div class="line">       paint.reset();</div><div class="line">       DashPathEffect dashPathEffect = new DashPathEffect(new float[]&#123;10, 5&#125;, 10);</div><div class="line">       paint.setPathEffect(dashPathEffect);</div><div class="line">       paint.setStyle(Paint.Style.STROKE);</div><div class="line">       paint.setStrokeWidth(1);</div><div class="line">       canvas.drawCircle(100, height / 2 + 100, 100, paint);</div><div class="line"></div><div class="line">       Path path = new Path();</div><div class="line">       path.moveTo(0, height / 2 + 300);</div><div class="line">       initPath(path);</div><div class="line"></div><div class="line">       CornerPathEffect cornerPathEffect = new CornerPathEffect(10);</div><div class="line">       paint.setPathEffect(cornerPathEffect);</div><div class="line">       canvas.drawPath(path, paint);</div><div class="line"></div><div class="line"></div><div class="line">       path.reset();</div><div class="line">       path.moveTo(0, height / 2 + 400);</div><div class="line">       initPath(path);</div><div class="line">       DiscretePathEffect discretePathEffect = new DiscretePathEffect(20, 5);</div><div class="line">       paint.setPathEffect(discretePathEffect);</div><div class="line">       canvas.drawPath(path, paint);</div><div class="line"></div><div class="line">       path.reset();</div><div class="line">       path.moveTo(0, height / 2 + 500);</div><div class="line">       initPath(path);</div><div class="line">       Path dashPath = new Path();</div><div class="line">       dashPath.addCircle(10, 10, 10, Path.Direction.CCW);</div><div class="line">       PathDashPathEffect pathDashPathEffect = new PathDashPathEffect(dashPath, 40, 0, PathDashPathEffect.Style.TRANSLATE);</div><div class="line">       paint.setPathEffect(pathDashPathEffect);</div><div class="line">       canvas.drawPath(path, paint);</div><div class="line"></div><div class="line">       SumPathEffect sumPathEffect = new SumPathEffect(dashPathEffect, discretePathEffect);</div><div class="line">       path.reset();</div><div class="line">       path.moveTo(0, height / 2 + 600);</div><div class="line">       initPath(path);</div><div class="line">       paint.setPathEffect(sumPathEffect);</div><div class="line">       canvas.drawPath(path, paint);</div><div class="line"></div><div class="line">       ComposePathEffect composePathEffect = new ComposePathEffect(dashPathEffect, discretePathEffect);</div><div class="line">       path.reset();</div><div class="line">       path.moveTo(0, height / 2 + 700);</div><div class="line">       initPath(path);</div><div class="line">       paint.setPathEffect(composePathEffect);</div><div class="line">       canvas.drawPath(path, paint)</div><div class="line">       paint.getFillPath(path,)</div><div class="line"></div><div class="line">       paint.reset();</div><div class="line">       paint.setShadowLayer(5, 0, 0, Color.BLACK);</div><div class="line">       paint.setTextSize(80);</div><div class="line">       canvas.drawText(&quot;周一诺是个胖子&quot;, 0, height / 2 + 800, paint);</div><div class="line"></div><div class="line"></div><div class="line">       paint.reset();</div><div class="line">       BlurMaskFilter blurMaskFilter = new BlurMaskFilter(50, BlurMaskFilter.Blur.NORMAL);</div><div class="line">       paint.setMaskFilter(blurMaskFilter);</div><div class="line">       canvas.drawBitmap(bitmap, new Rect(0, 0, width, height), new Rect(width, height / 2, width * 3 / 2, height), paint);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   private void initPath(Path path) &#123;</div><div class="line">       path.rLineTo(200, 0);</div><div class="line">       path.rLineTo(100, 100);</div><div class="line">       path.rLineTo(200, -200);</div><div class="line">       path.rLineTo(100, 300);</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p><strong>效果</strong></p>
+<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/effects.png" alt="image"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/14/2017-8-14-view-2/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-2017-8-11-view-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/11/2017-8-11-view-1/">View绘制学习笔记(1)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/11/2017-8-11-view-1/" class="archive-article-date">
+  	<time datetime="2017-08-11T04:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="View绘制学习笔记一"><a href="#View绘制学习笔记一" class="headerlink" title="View绘制学习笔记一"></a>View绘制学习笔记一</h2><h3 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h3><ul>
+<li>自定义绘制的方式是重写绘制方法，其中最常用的是 onDraw()</li>
+<li>绘制的关键是 Canvas 的使用<ul>
+<li>Canvas 的绘制类方法： drawXXX() （关键参数：Paint）</li>
+<li>Canvas 的辅助类方法：范围裁切和几何变换</li>
+</ul>
+</li>
+<li>可以使用不同的绘制方法来控制遮盖关系</li>
+</ul>
+<h3 id="Canvas-画布"><a href="#Canvas-画布" class="headerlink" title="Canvas 画布"></a>Canvas 画布</h3><ul>
+<li>概念<ul>
+<li>onDraw传递进来的唯一参数，控件的绘制都是在Canvas中完成</li>
+</ul>
+</li>
+<li><p>画布提供的绘制相关的方法drawXXXX  </p>
+<ul>
+<li>drawColor(drawRGB or drawARGB) 图层上面直接绘制颜色</li>
+<li>drawPaint(paint) 在整个图层上直接使用画笔绘制(整个图层一般是一个矩形)</li>
+<li>drawPoint 画点(可以通过Paint设置 圆点还是方点)</li>
+<li>drawLine 画线</li>
+<li>drawRect 绘制矩形</li>
+<li><p>drawOval 四个参数代表椭圆的左上角和右下角的坐标 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drawOval(float left, float top, float right, float bottom, Paint paint)</div></pre></td></tr></table></figure>
+</li>
+<li><p>drawCircle 绘制圆形 参数分别为 圆心坐标和半径    </p>
+</li>
+<li>drawArc 参数类似于drawOval ，多了一个useCenter ,如果为true 则为扇形，否则就是为一个弧形,sweepAngle 转过的角度，起始的角度可以任意设置</li>
+<li><p>drawRoundRect 绘制圆角矩形 ,其中rx和ry分别代表横向的半径和纵向的半径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry,</div><div class="line">       @NonNull Paint paint)</div></pre></td></tr></table></figure>
+</li>
+<li><p>drawPath 绘制复杂图像用到，Path是作为绘制复杂图像的工具类</p>
+</li>
+<li>drawPatch 绘制点九图 </li>
+<li>drawBitmap 绘制图片</li>
+<li>drawVertices ????</li>
+<li>drawText 绘制文本</li>
+<li>drawTextRun </li>
+<li>drawTextOnPath 在Path上面绘制文字</li>
+<li>drawPicture </li>
+</ul>
+</li>
+</ul>
+<h3 id="Path"><a href="#Path" class="headerlink" title="Path"></a>Path</h3><ul>
+<li><p>概念</p>
+<ul>
+<li>辅助绘制复杂图形的工具类，可以添加多个不同的图形，移动，划线等等</li>
+</ul>
+</li>
+<li><p>Path提供的方法</p>
+<ul>
+<li>reset 清空已经设置的全部的轨迹和图形</li>
+<li>rewind 类似于reset（新建对象，之前的对象直接舍弃），当时保留了内部的数据接口，再次使用时，不需要重新新建各种对象</li>
+<li>op(Path,Op) 结合两个Path，Op结合的策略</li>
+<li>FillType 填充的类型</li>
+<li>isRect(RectF) 判断是否是矩形，如果是，添加到Path</li>
+<li>moveTo 具体坐标 rMoveTo 相对于当前点的坐标</li>
+<li>lineTo 连线 rLineTo 相对坐标 </li>
+<li>quadTo(float x1, float y1, float x2, float y2)[rQuadTo] 二次贝塞尔曲线</li>
+<li>cubicTo rCubicTo float x1, float y1, float x2, float y2,float x3, float y3) 三次贝塞尔曲线</li>
+<li>arcTo(float left, float top, float right, float bottom, float startAngle,float sweepAngle, boolean forceMoveTo)  圆弧，forceMoveTo判断是否移动目标点，false 会留下轨迹</li>
+<li>close 闭合，相当于画一条线连接起始点【如果是Fill 自动闭合】，如果本身存在交叉，调用此方法将没有任何作用，另外绘制圆弧的其实点，不在线开始的地方，而在矩形的左上角</li>
+</ul>
+</li>
+</ul>
+<h3 id="绘制饼图、柱状图、折线图-等"><a href="#绘制饼图、柱状图、折线图-等" class="headerlink" title="绘制饼图、柱状图、折线图 等"></a>绘制饼图、柱状图、折线图 等</h3><h4 id="绘制饼图"><a href="#绘制饼图" class="headerlink" title="绘制饼图"></a>绘制饼图</h4><p>效果图<img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/pai_chart.png" alt=":"><br>实现方式:</p>
+<ol>
+<li>绘制圆形 drawArc,设置好偏移</li>
+<li>每绘制一个弧形，都需要重新设置画笔颜色</li>
+<li>startX,startY,gap 设置好的参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">protected void onDraw(Canvas canvas) &#123;</div><div class="line">        super.onDraw(canvas);</div><div class="line">        paint.setColor(Color.RED);</div><div class="line">        canvas.drawArc(startX, startY, startX + 400, startY + 400, -45, -135, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.BLUE);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, -45, 45, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.BLACK);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 0, 20, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.GREEN);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 20, 40, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.GRAY);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 60, 60, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.YELLOW);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 120, 35, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.LTGRAY);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 155, 25, true, paint);</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="绘制心形-和-文字"><a href="#绘制心形-和-文字" class="headerlink" title="绘制心形 和 文字"></a>绘制心形 和 文字</h4><ol>
+<li>主要通过调用drawPath 和 drawText 这两个API</li>
+<li>如果Paint设置为Fill，如果绘制的线存在交叉，将不会填充，只有不交叉的图形才会填充</li>
+</ol>
+<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/heart-text.png" alt="image"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">private void init() &#123;</div><div class="line">        paint = new Paint();</div><div class="line">        paint.setAntiAlias(true);</div><div class="line">        paint.setColor(Color.BLACK);</div><div class="line">        paint.setStyle(Paint.Style.FILL);</div><div class="line">        path = new Path();</div><div class="line">        path.addArc(startX, startY, startX + 200, startY + 200, 0, -180);</div><div class="line">        path.addArc(startX + 200, startY, startX + 400, startY + 200, 0, -180);</div><div class="line">        path.moveTo(startX + 400, startY + 100);</div><div class="line">        path.rLineTo(-200, 250);</div><div class="line">        path.lineTo(startX, startY + 100);</div><div class="line"></div><div class="line">        textPaint = new Paint();</div><div class="line">        textPaint.setColor(Color.BLACK);</div><div class="line">        textPaint.setAntiAlias(true);</div><div class="line">        textPaint.setStrokeWidth(6);</div><div class="line">        textPaint.setTextSize(80);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDraw(Canvas canvas) &#123;</div><div class="line">        super.onDraw(canvas);</div><div class="line">        canvas.drawPath(path, paint);</div><div class="line">        canvas.drawText(&quot;周一诺是个胖子&quot;, 100, 600, textPaint);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/11/2017-8-11-view-1/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-about-study" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
