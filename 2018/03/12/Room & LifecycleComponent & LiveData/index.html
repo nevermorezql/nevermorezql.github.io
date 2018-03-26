@@ -6,18 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2018 | NEVERMORE</title>
+  <title>Android开发框架 | NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="周庆龙个人技术博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEVERMORE">
-<meta property="og:url" content="http://yoursite.com/archives/2018/index.html">
+  <meta name="description" content="作用Google为了方便和简化Android开发的框架而设计出来几个通用的开发组件 1. LifeCycleComponent谷歌官方推出的生命周期感知组件包含：  LifeCycleOwner  提供的生命周期的类  Activity，Fragment等 LifeCycleObservor 监听生命周期的接口  用法： 12345678910111213141516171819202122232">
+<meta name="keywords" content="技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android开发框架">
+<meta property="og:url" content="http://yoursite.com/2018/03/12/Room & LifecycleComponent & LiveData/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="周庆龙个人技术博客">
+<meta property="og:description" content="作用Google为了方便和简化Android开发的框架而设计出来几个通用的开发组件 1. LifeCycleComponent谷歌官方推出的生命周期感知组件包含：  LifeCycleOwner  提供的生命周期的类  Activity，Fragment等 LifeCycleObservor 监听生命周期的接口  用法： 12345678910111213141516171819202122232">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-03-26T03:22:48.295Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NEVERMORE">
-<meta name="twitter:description" content="周庆龙个人技术博客">
+<meta name="twitter:title" content="Android开发框架">
+<meta name="twitter:description" content="作用Google为了方便和简化Android开发的框架而设计出来几个通用的开发组件 1. LifeCycleComponent谷歌官方推出的生命周期感知组件包含：  LifeCycleOwner  提供的生命周期的类  Activity，Fragment等 LifeCycleObservor 监听生命周期的接口  用法： 12345678910111213141516171819202122232">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -155,36 +157,67 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Room &amp; LifecycleComponent &amp; LiveData" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android开发框架
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Room & LifecycleComponent & LiveData/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>Google为了方便和简化Android开发的框架而设计出来几个通用的开发组件</p>
+<h3 id="1-LifeCycleComponent"><a href="#1-LifeCycleComponent" class="headerlink" title="1. LifeCycleComponent"></a>1. LifeCycleComponent</h3><p>谷歌官方推出的生命周期感知组件<br>包含：</p>
+<ul>
+<li>LifeCycleOwner  提供的生命周期的类  Activity，Fragment等</li>
+<li>LifeCycleObservor 监听生命周期的接口</li>
+</ul>
+<p>用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"> //最后绑定生命周期，目前support包已经支持直接获取getLifecycle</div><div class="line">getLifecycle().addObserver(ScanBarcodeManager);</div><div class="line"></div><div class="line"></div><div class="line">public class ScanBarcodeManager implements LifecycleObserver</div><div class="line"></div><div class="line"></div><div class="line">   /**</div><div class="line">     * 确保先初始化</div><div class="line">     */</div><div class="line">    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)</div><div class="line">    public void handlePause() &#123;</div><div class="line">        checkInit();</div><div class="line">        cameraManager.stopPreview();</div><div class="line">        cameraManager.closeDriver();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)</div><div class="line">    public void handleResume() &#123;</div><div class="line">        checkInit();</div><div class="line">        if (surfaceCreated) &#123;</div><div class="line">            startAndReg(surfaceHolder);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h3 id="2-ViewModel"><a href="#2-ViewModel" class="headerlink" title="2, ViewModel"></a>2, ViewModel</h3><p>ViewModel 本身是一个只有一个方法的抽象类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public abstract class ViewModel &#123;</div><div class="line">    /**</div><div class="line">     * This method will be called when this ViewModel is no longer used and will be destroyed.</div><div class="line">     * &lt;p&gt;</div><div class="line">     * It is useful when ViewModel observes some data and you need to clear this subscription to</div><div class="line">     * prevent a leak of this ViewModel.</div><div class="line">     */</div><div class="line">    @SuppressWarnings(&quot;WeakerAccess&quot;)</div><div class="line">    protected void onCleared() &#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中onCleared方法，会在绑定的控件完全销毁时调用</p>
+<p>一般生产的ViewModel的方法可以通过：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public abstract class BaseActivity&lt;T extends ViewModel&gt; extends FragmentActivity implements EasyPermissions.PermissionCallbacks &#123;</div><div class="line"></div><div class="line"></div><div class="line">viewModel = ViewModelProviders.of(this).get(getViewModelClazz());</div><div class="line"></div><div class="line">   /**</div><div class="line">     * 获取子类的泛型类</div><div class="line">     *</div><div class="line">     * @return</div><div class="line">     */</div><div class="line">    private Class&lt;T&gt; getViewModelClazz() &#123;</div><div class="line">        Class&lt;? extends BaseActivity&gt; clazz = this.getClass();</div><div class="line">        ParameterizedType type = (ParameterizedType) clazz.getGenericSuperclass();</div><div class="line">        Type[] types = type.getActualTypeArguments();</div><div class="line">        return (Class&lt;T&gt;) types[0];</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>获得，ViewModelProviders的作用是把Activity或者Fragment 跟ViewModel绑定，内部的机制是，同一个Activity实例或者Fragment实例在其整个生命周期中只对应一个ViewModel实例。</p>
+<h3 id="3-LiveData"><a href="#3-LiveData" class="headerlink" title="3,LiveData"></a>3,LiveData</h3><p>LiveData是一个可被监控的数据持有类，LiveData可以跟组件绑定（实现了LifecycleOwner的组件）,这样可以避免很多Android开发常见的问题：</p>
+<ul>
+<li>Ensures your UI matches your data state 确保数据跟UI状态绑定(只有UI状态是Active的时候，才会更新UI数据)</li>
+<li>No memory leaks 不会有内存泄漏</li>
+<li>No crashes due to stopped activities 不会有因为Activity已经被回收后更新UI导致的崩溃</li>
+<li>No more manual lifecycle handling 不用手动管理生命周期</li>
+<li>Always up to date data 总是保持最新的数据</li>
+<li>Proper configuration changes 当UI配置改变时，会第一时间更新数据</li>
+<li>Sharing resources 共享资源，可以在整个系统中LiveData实现为单例，这样可以完美实现数据的复用</li>
+<li>使用方法：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// Get the ViewModel.</div><div class="line">       mModel = ViewModelProviders.of(this).get(NameViewModel.class);</div><div class="line"></div><div class="line">       // Create the observer which updates the UI.</div><div class="line">       final Observer&lt;String&gt; nameObserver = new Observer&lt;String&gt;() &#123;</div><div class="line">           @Override</div><div class="line">           public void onChanged(@Nullable final String newName) &#123;</div><div class="line">               // Update the UI, in this case, a TextView.</div><div class="line">               mNameTextView.setText(newName);</div><div class="line">           &#125;</div><div class="line">       &#125;;</div><div class="line"></div><div class="line">       // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.</div><div class="line">       mModel.getCurrentName().observe(this, nameObserver);</div></pre></td></tr></table></figure>
+<h3 id="4-ROOM"><a href="#4-ROOM" class="headerlink" title="4, ROOM"></a>4, ROOM</h3><p>Room是google提供的数据操作的组件，完美支持LiveData和RxJava，主要有三个模块，Entity，Dao，Database</p>
+<h2 id="Entity-实体类"><a href="#Entity-实体类" class="headerlink" title="- Entity 实体类"></a>- Entity 实体类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//简单的实体类，注意Ignore注解，会忽略该字段，另外访问限定符，public或者提供getter和setter</div><div class="line">@Entity</div><div class="line">class User &#123;</div><div class="line">    @PrimaryKey</div><div class="line">    public int id;</div><div class="line"></div><div class="line">    public String firstName;</div><div class="line">    public String lastName;</div><div class="line"></div><div class="line">    @Ignore</div><div class="line">    Bitmap picture;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">//联合主键</div><div class="line">@Entity(primaryKeys = &#123;&quot;firstName&quot;, &quot;lastName&quot;&#125;)</div><div class="line">class User &#123;</div><div class="line">    public String firstName;</div><div class="line">    public String lastName;</div><div class="line"></div><div class="line">    @Ignore</div><div class="line">    Bitmap picture;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//外键</div><div class="line">@Entity(foreignKeys = @ForeignKey(entity = User.class,</div><div class="line">                                  parentColumns = &quot;id&quot;,</div><div class="line">                                  childColumns = &quot;user_id&quot;))</div><div class="line">class Book &#123;</div><div class="line">    @PrimaryKey</div><div class="line">    public int bookId;</div><div class="line"></div><div class="line">    public String title;</div><div class="line"></div><div class="line">    @ColumnInfo(name = &quot;user_id&quot;)</div><div class="line">    public int userId;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>DAO</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line">//定义的insert操作</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Insert(onConflict = OnConflictStrategy.REPLACE)</div><div class="line">    public void insertUsers(User... users);</div><div class="line"></div><div class="line">    @Insert</div><div class="line">    public void insertBothUsers(User user1, User user2);</div><div class="line"></div><div class="line">    @Insert</div><div class="line">    public void insertUsersAndFriends(User user, List&lt;User&gt; friends);</div><div class="line">&#125;</div><div class="line"></div><div class="line">//update  </div><div class="line"></div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Update</div><div class="line">    public void updateUsers(User... users);</div><div class="line">&#125;</div><div class="line"></div><div class="line">//不管是insert还是update，传递的数据都是对象、</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//DELETE</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Delete</div><div class="line">    public void deleteUsers(User... users);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">//QUERY</div><div class="line">查询语句可以自由拼写SQL，条件用冒号，如果查询出来的数据不是原始的model，可以自定义model，只要字段名称和model对应即可</div><div class="line"></div><div class="line">public class NameTuple &#123;</div><div class="line">    @ColumnInfo(name=&quot;first_name&quot;)</div><div class="line">    public String firstName;</div><div class="line"></div><div class="line">    @ColumnInfo(name=&quot;last_name&quot;)</div><div class="line">    public String lastName;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Query(&quot;SELECT first_name, last_name FROM user&quot;)</div><div class="line">    public List&lt;NameTuple&gt; loadFullName();</div><div class="line">&#125;</div><div class="line"></div><div class="line">//查询回来的数据可以使LiveData，也可以是RxJava</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Query(&quot;SELECT first_name, last_name FROM user WHERE region IN (:regions)&quot;)</div><div class="line">    public LiveData&lt;List&lt;User&gt;&gt; loadUsersFromRegionsSync(List&lt;String&gt; regions);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">//查询出来query</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Query(&quot;SELECT first_name, last_name FROM user WHERE region IN (:regions)&quot;)</div><div class="line">    public LiveData&lt;List&lt;User&gt;&gt; loadUsersFromRegionsSync(List&lt;String&gt; regions);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/22/Handler详解/" class="archive-article-date">
-  	<time datetime="2018-03-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/22/Handler详解/">Handler详解</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -196,7 +229,7 @@ var _hmt = _hmt || [];
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -209,409 +242,122 @@ var _hmt = _hmt || [];
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2018/03/12/Room & LifecycleComponent & LiveData/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/20/Android Binder机制-3(ServiceManager)/" class="archive-article-date">
-  	<time datetime="2018-03-19T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-20</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2018/03/16/App的启动流程（Android8.0） 第一篇/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          App启动流程（Android 8.0源码）(1)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/12/Android屏幕适配/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android屏幕适配</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/20/Android Binder机制-3(ServiceManager)/">Binder-3 (ServiceManager)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/19/App的启动流程（Android8.0） 第二篇/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/19/App的启动流程（Android8.0） 第二篇/">App启动流程（Android 8.0源码）(2)</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/19/Android Binder机制-2(参照GitYuan)/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">Binder-2 (Gityuan Blog)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/18/Android Binder机制-1(参照Gityuan)/" class="archive-article-date">
-  	<time datetime="2018-03-17T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-18</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/18/Android Binder机制-1(参照Gityuan)/">Binder-1 (Gityuan Blog)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/16/App的启动流程（Android8.0） 第一篇/" class="archive-article-date">
-  	<time datetime="2018-03-15T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-16</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/16/App的启动流程（Android8.0） 第一篇/">App启动流程（Android 8.0源码）(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/12/Room & LifecycleComponent & LiveData/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/12/Room & LifecycleComponent & LiveData/">Android开发框架</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/12/Android屏幕适配/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/12/Android屏幕适配/">Android屏幕适配</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
+  
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script>
+  var cloudTieConfig = {
+    url: "http://yoursite.com/2018/03/12/Room &amp; LifecycleComponent &amp; LiveData/", 
+    sourceId: "Room &amp; LifecycleComponent &amp; LiveData",
+    productKey: "true",
+    target: "cloud-tie-wrapper"
+  };
+</script>
+<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -634,8 +380,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

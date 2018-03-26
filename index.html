@@ -359,115 +359,6 @@ var _hmt = _hmt || [];
 
 
   
-    <article id="post-Android Binder机制-2(参照GitYuan)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">Binder-2 (Gityuan Blog)</a>
-    </h1>
-  
-
-        
-        <a href="/2018/03/19/Android Binder机制-2(参照GitYuan)/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Binder驱动篇"><a href="#Binder驱动篇" class="headerlink" title="Binder驱动篇"></a>Binder驱动篇</h2><p>Binder驱动是Android专用的，但底层的驱动架构与Linux驱动一样。binder驱动在以misc设备进行注册，作为虚拟字符设备，没有直接操作硬件，只是对设备内存的处理。主要是驱动设备的初始化(binder_init)，打开 (binder_open)，映射(binder_mmap)，数据操作(binder_ioctl)</p>
-<p>misc_device是特殊的字符设备。注册驱动程序时采用misc_register函数注册，此函数中会自动创建设备节点，即设备文件。无需mknod指令创建设备文件。因为misc_register()会调用class_device_create()或者device_create()。使用misc创建字符设备最简单方便。</p>
-<p><img src="http://gityuan.com/images/binder/binder_dev/binder_driver.png" alt="image"></p>
-<h2 id="1-系统调用"><a href="#1-系统调用" class="headerlink" title="1. 系统调用"></a>1. 系统调用</h2><p>用户态的程序调用Kernel层驱动是需要陷入内核态，进行系统调用(syscall)，比如打开Binder驱动方法的调用链为： open-&gt; <strong>open() -&gt; binder_open()。 open()为用户空间的方法，</strong>open()便是系统调用中相应的处理方法，通过查找，对应调用到内核binder驱动的binder_open()方法，至于其他的从用户态陷入内核态的流程也基本一致。</p>
-<p><img src="http://gityuan.com/images/binder/binder_dev/binder_syscall.png" alt="image"></p>
-<p>简单说，当用户空间调用open()方法，最终会调用binder驱动的binder_open()方法；mmap()/ioctl()方法也是同理，在BInder系列的后续文章从用户态进入内核态，都依赖于系统调用过程。</p>
-<h2 id="2-关键方法"><a href="#2-关键方法" class="headerlink" title="2. 关键方法"></a>2. 关键方法</h2><ul>
-<li>binder_init：初始化字符设备；</li>
-<li>binder_open：打开驱动设备，过程需要持有binder_main_lock同步锁；</li>
-<li>binder_mmap：申请内存空间，该过程需要持有binder_mmap_lock同步锁；</li>
-<li>binder_ioctl：执行相应的ioctl操作，该过程需要持有binder_main_lock同步锁；当处于binder_thread_read过程，read_buffer无数据则释放同步锁，并处于wait_event_freezable过程，等有数据到来则唤醒并尝试持有同步锁。</li>
-</ul>
-<hr>
-<p>binder最底层源码为C，不需要完全了解，只需要大概知道其原理</p>
-<h2 id="3-Binder通讯简介"><a href="#3-Binder通讯简介" class="headerlink" title="3. Binder通讯简介"></a>3. Binder通讯简介</h2><p>一张图就可以解释：<br><img src="http://gityuan.com/images/binder/binder_dev/binder_ipc.jpg" alt="image"></p>
-<h2 id="取个例子："><a href="#取个例子：" class="headerlink" title="取个例子："></a>取个例子：</h2><p>例如，当名为BatteryStatsService的Client向ServiceManager注册服务的过程中，IPC层的数据组成为：Handle=0，RPC代码为ADD_SERVICE_TRANSACTION，RPC数据为BatteryStatsService，Binder协议为BC_TRANSACTION。</p>
-<h2 id="4-Binder通讯协议"><a href="#4-Binder通讯协议" class="headerlink" title="4. Binder通讯协议"></a>4. Binder通讯协议</h2><p><img src="http://gityuan.com/images/binder/binder_dev/binder_transaction_ipc.jpg" alt="image"></p>
-<p>Binder协议包含在IPC数据中，分为两类:</p>
-<ul>
-<li>BINDER_COMMAND<em>PROTOCOL：binder请求码，以”BC</em>“开头，简称BC码，用于从IPC层传递到Binder Driver层；</li>
-<li>BINDER_RETURN<em>PROTOCOL ：binder响应码，以”BR</em>“开头，简称BR码，用于从Binder Driver层传递到IPC层；</li>
-</ul>
-<p><strong>通讯过程</strong><br><img src="http://gityuan.com/images/binder/binder_dev/binder_protocol.jpg" alt="image"></p>
-<p>++具体的过程省略。了解大概的框架即可++</p>
-<p>可参考博文阅读源码：<br><a href="http://gityuan.com/2015/11/02/binder-driver-2/" target="_blank" rel="external">http://gityuan.com/2015/11/02/binder-driver-2/</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-App的启动流程（Android8.0） 第二篇" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -563,6 +454,115 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2018/03/19/App的启动流程（Android8.0） 第二篇/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Android Binder机制-2(参照GitYuan)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">Binder-2 (Gityuan Blog)</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/19/Android Binder机制-2(参照GitYuan)/" class="archive-article-date">
+  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Binder驱动篇"><a href="#Binder驱动篇" class="headerlink" title="Binder驱动篇"></a>Binder驱动篇</h2><p>Binder驱动是Android专用的，但底层的驱动架构与Linux驱动一样。binder驱动在以misc设备进行注册，作为虚拟字符设备，没有直接操作硬件，只是对设备内存的处理。主要是驱动设备的初始化(binder_init)，打开 (binder_open)，映射(binder_mmap)，数据操作(binder_ioctl)</p>
+<p>misc_device是特殊的字符设备。注册驱动程序时采用misc_register函数注册，此函数中会自动创建设备节点，即设备文件。无需mknod指令创建设备文件。因为misc_register()会调用class_device_create()或者device_create()。使用misc创建字符设备最简单方便。</p>
+<p><img src="http://gityuan.com/images/binder/binder_dev/binder_driver.png" alt="image"></p>
+<h2 id="1-系统调用"><a href="#1-系统调用" class="headerlink" title="1. 系统调用"></a>1. 系统调用</h2><p>用户态的程序调用Kernel层驱动是需要陷入内核态，进行系统调用(syscall)，比如打开Binder驱动方法的调用链为： open-&gt; <strong>open() -&gt; binder_open()。 open()为用户空间的方法，</strong>open()便是系统调用中相应的处理方法，通过查找，对应调用到内核binder驱动的binder_open()方法，至于其他的从用户态陷入内核态的流程也基本一致。</p>
+<p><img src="http://gityuan.com/images/binder/binder_dev/binder_syscall.png" alt="image"></p>
+<p>简单说，当用户空间调用open()方法，最终会调用binder驱动的binder_open()方法；mmap()/ioctl()方法也是同理，在BInder系列的后续文章从用户态进入内核态，都依赖于系统调用过程。</p>
+<h2 id="2-关键方法"><a href="#2-关键方法" class="headerlink" title="2. 关键方法"></a>2. 关键方法</h2><ul>
+<li>binder_init：初始化字符设备；</li>
+<li>binder_open：打开驱动设备，过程需要持有binder_main_lock同步锁；</li>
+<li>binder_mmap：申请内存空间，该过程需要持有binder_mmap_lock同步锁；</li>
+<li>binder_ioctl：执行相应的ioctl操作，该过程需要持有binder_main_lock同步锁；当处于binder_thread_read过程，read_buffer无数据则释放同步锁，并处于wait_event_freezable过程，等有数据到来则唤醒并尝试持有同步锁。</li>
+</ul>
+<hr>
+<p>binder最底层源码为C，不需要完全了解，只需要大概知道其原理</p>
+<h2 id="3-Binder通讯简介"><a href="#3-Binder通讯简介" class="headerlink" title="3. Binder通讯简介"></a>3. Binder通讯简介</h2><p>一张图就可以解释：<br><img src="http://gityuan.com/images/binder/binder_dev/binder_ipc.jpg" alt="image"></p>
+<h2 id="取个例子："><a href="#取个例子：" class="headerlink" title="取个例子："></a>取个例子：</h2><p>例如，当名为BatteryStatsService的Client向ServiceManager注册服务的过程中，IPC层的数据组成为：Handle=0，RPC代码为ADD_SERVICE_TRANSACTION，RPC数据为BatteryStatsService，Binder协议为BC_TRANSACTION。</p>
+<h2 id="4-Binder通讯协议"><a href="#4-Binder通讯协议" class="headerlink" title="4. Binder通讯协议"></a>4. Binder通讯协议</h2><p><img src="http://gityuan.com/images/binder/binder_dev/binder_transaction_ipc.jpg" alt="image"></p>
+<p>Binder协议包含在IPC数据中，分为两类:</p>
+<ul>
+<li>BINDER_COMMAND<em>PROTOCOL：binder请求码，以”BC</em>“开头，简称BC码，用于从IPC层传递到Binder Driver层；</li>
+<li>BINDER_RETURN<em>PROTOCOL ：binder响应码，以”BR</em>“开头，简称BR码，用于从Binder Driver层传递到IPC层；</li>
+</ul>
+<p><strong>通讯过程</strong><br><img src="http://gityuan.com/images/binder/binder_dev/binder_protocol.jpg" alt="image"></p>
+<p>++具体的过程省略。了解大概的框架即可++</p>
+<p>可参考博文阅读源码：<br><a href="http://gityuan.com/2015/11/02/binder-driver-2/" target="_blank" rel="external">http://gityuan.com/2015/11/02/binder-driver-2/</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">展开全文 >></a>
         </p>
       
 
@@ -831,6 +831,401 @@ var _hmt = _hmt || [];
 
 
   
+    <article id="post-Room &amp; LifecycleComponent &amp; LiveData" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/Room & LifecycleComponent & LiveData/">Android开发框架</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Room & LifecycleComponent & LiveData/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>Google为了方便和简化Android开发的框架而设计出来几个通用的开发组件</p>
+<h3 id="1-LifeCycleComponent"><a href="#1-LifeCycleComponent" class="headerlink" title="1. LifeCycleComponent"></a>1. LifeCycleComponent</h3><p>谷歌官方推出的生命周期感知组件<br>包含：</p>
+<ul>
+<li>LifeCycleOwner  提供的生命周期的类  Activity，Fragment等</li>
+<li>LifeCycleObservor 监听生命周期的接口</li>
+</ul>
+<p>用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"> //最后绑定生命周期，目前support包已经支持直接获取getLifecycle</div><div class="line">getLifecycle().addObserver(ScanBarcodeManager);</div><div class="line"></div><div class="line"></div><div class="line">public class ScanBarcodeManager implements LifecycleObserver</div><div class="line"></div><div class="line"></div><div class="line">   /**</div><div class="line">     * 确保先初始化</div><div class="line">     */</div><div class="line">    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)</div><div class="line">    public void handlePause() &#123;</div><div class="line">        checkInit();</div><div class="line">        cameraManager.stopPreview();</div><div class="line">        cameraManager.closeDriver();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)</div><div class="line">    public void handleResume() &#123;</div><div class="line">        checkInit();</div><div class="line">        if (surfaceCreated) &#123;</div><div class="line">            startAndReg(surfaceHolder);</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<h3 id="2-ViewModel"><a href="#2-ViewModel" class="headerlink" title="2, ViewModel"></a>2, ViewModel</h3><p>ViewModel 本身是一个只有一个方法的抽象类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public abstract class ViewModel &#123;</div><div class="line">    /**</div><div class="line">     * This method will be called when this ViewModel is no longer used and will be destroyed.</div><div class="line">     * &lt;p&gt;</div><div class="line">     * It is useful when ViewModel observes some data and you need to clear this subscription to</div><div class="line">     * prevent a leak of this ViewModel.</div><div class="line">     */</div><div class="line">    @SuppressWarnings(&quot;WeakerAccess&quot;)</div><div class="line">    protected void onCleared() &#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中onCleared方法，会在绑定的控件完全销毁时调用</p>
+<p>一般生产的ViewModel的方法可以通过：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public abstract class BaseActivity&lt;T extends ViewModel&gt; extends FragmentActivity implements EasyPermissions.PermissionCallbacks &#123;</div><div class="line"></div><div class="line"></div><div class="line">viewModel = ViewModelProviders.of(this).get(getViewModelClazz());</div><div class="line"></div><div class="line">   /**</div><div class="line">     * 获取子类的泛型类</div><div class="line">     *</div><div class="line">     * @return</div><div class="line">     */</div><div class="line">    private Class&lt;T&gt; getViewModelClazz() &#123;</div><div class="line">        Class&lt;? extends BaseActivity&gt; clazz = this.getClass();</div><div class="line">        ParameterizedType type = (ParameterizedType) clazz.getGenericSuperclass();</div><div class="line">        Type[] types = type.getActualTypeArguments();</div><div class="line">        return (Class&lt;T&gt;) types[0];</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>获得，ViewModelProviders的作用是把Activity或者Fragment 跟ViewModel绑定，内部的机制是，同一个Activity实例或者Fragment实例在其整个生命周期中只对应一个ViewModel实例。</p>
+<h3 id="3-LiveData"><a href="#3-LiveData" class="headerlink" title="3,LiveData"></a>3,LiveData</h3><p>LiveData是一个可被监控的数据持有类，LiveData可以跟组件绑定（实现了LifecycleOwner的组件）,这样可以避免很多Android开发常见的问题：</p>
+<ul>
+<li>Ensures your UI matches your data state 确保数据跟UI状态绑定(只有UI状态是Active的时候，才会更新UI数据)</li>
+<li>No memory leaks 不会有内存泄漏</li>
+<li>No crashes due to stopped activities 不会有因为Activity已经被回收后更新UI导致的崩溃</li>
+<li>No more manual lifecycle handling 不用手动管理生命周期</li>
+<li>Always up to date data 总是保持最新的数据</li>
+<li>Proper configuration changes 当UI配置改变时，会第一时间更新数据</li>
+<li>Sharing resources 共享资源，可以在整个系统中LiveData实现为单例，这样可以完美实现数据的复用</li>
+<li>使用方法：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// Get the ViewModel.</div><div class="line">       mModel = ViewModelProviders.of(this).get(NameViewModel.class);</div><div class="line"></div><div class="line">       // Create the observer which updates the UI.</div><div class="line">       final Observer&lt;String&gt; nameObserver = new Observer&lt;String&gt;() &#123;</div><div class="line">           @Override</div><div class="line">           public void onChanged(@Nullable final String newName) &#123;</div><div class="line">               // Update the UI, in this case, a TextView.</div><div class="line">               mNameTextView.setText(newName);</div><div class="line">           &#125;</div><div class="line">       &#125;;</div><div class="line"></div><div class="line">       // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.</div><div class="line">       mModel.getCurrentName().observe(this, nameObserver);</div></pre></td></tr></table></figure>
+<h3 id="4-ROOM"><a href="#4-ROOM" class="headerlink" title="4, ROOM"></a>4, ROOM</h3><p>Room是google提供的数据操作的组件，完美支持LiveData和RxJava，主要有三个模块，Entity，Dao，Database</p>
+<h2 id="Entity-实体类"><a href="#Entity-实体类" class="headerlink" title="- Entity 实体类"></a>- Entity 实体类</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">//简单的实体类，注意Ignore注解，会忽略该字段，另外访问限定符，public或者提供getter和setter</div><div class="line">@Entity</div><div class="line">class User &#123;</div><div class="line">    @PrimaryKey</div><div class="line">    public int id;</div><div class="line"></div><div class="line">    public String firstName;</div><div class="line">    public String lastName;</div><div class="line"></div><div class="line">    @Ignore</div><div class="line">    Bitmap picture;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">//联合主键</div><div class="line">@Entity(primaryKeys = &#123;&quot;firstName&quot;, &quot;lastName&quot;&#125;)</div><div class="line">class User &#123;</div><div class="line">    public String firstName;</div><div class="line">    public String lastName;</div><div class="line"></div><div class="line">    @Ignore</div><div class="line">    Bitmap picture;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//外键</div><div class="line">@Entity(foreignKeys = @ForeignKey(entity = User.class,</div><div class="line">                                  parentColumns = &quot;id&quot;,</div><div class="line">                                  childColumns = &quot;user_id&quot;))</div><div class="line">class Book &#123;</div><div class="line">    @PrimaryKey</div><div class="line">    public int bookId;</div><div class="line"></div><div class="line">    public String title;</div><div class="line"></div><div class="line">    @ColumnInfo(name = &quot;user_id&quot;)</div><div class="line">    public int userId;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>DAO</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line">//定义的insert操作</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Insert(onConflict = OnConflictStrategy.REPLACE)</div><div class="line">    public void insertUsers(User... users);</div><div class="line"></div><div class="line">    @Insert</div><div class="line">    public void insertBothUsers(User user1, User user2);</div><div class="line"></div><div class="line">    @Insert</div><div class="line">    public void insertUsersAndFriends(User user, List&lt;User&gt; friends);</div><div class="line">&#125;</div><div class="line"></div><div class="line">//update  </div><div class="line"></div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Update</div><div class="line">    public void updateUsers(User... users);</div><div class="line">&#125;</div><div class="line"></div><div class="line">//不管是insert还是update，传递的数据都是对象、</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">//DELETE</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Delete</div><div class="line">    public void deleteUsers(User... users);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">//QUERY</div><div class="line">查询语句可以自由拼写SQL，条件用冒号，如果查询出来的数据不是原始的model，可以自定义model，只要字段名称和model对应即可</div><div class="line"></div><div class="line">public class NameTuple &#123;</div><div class="line">    @ColumnInfo(name=&quot;first_name&quot;)</div><div class="line">    public String firstName;</div><div class="line"></div><div class="line">    @ColumnInfo(name=&quot;last_name&quot;)</div><div class="line">    public String lastName;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Query(&quot;SELECT first_name, last_name FROM user&quot;)</div><div class="line">    public List&lt;NameTuple&gt; loadFullName();</div><div class="line">&#125;</div><div class="line"></div><div class="line">//查询回来的数据可以使LiveData，也可以是RxJava</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Query(&quot;SELECT first_name, last_name FROM user WHERE region IN (:regions)&quot;)</div><div class="line">    public LiveData&lt;List&lt;User&gt;&gt; loadUsersFromRegionsSync(List&lt;String&gt; regions);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">//查询出来query</div><div class="line">@Dao</div><div class="line">public interface MyDao &#123;</div><div class="line">    @Query(&quot;SELECT first_name, last_name FROM user WHERE region IN (:regions)&quot;)</div><div class="line">    public LiveData&lt;List&lt;User&gt;&gt; loadUsersFromRegionsSync(List&lt;String&gt; regions);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/12/Room & LifecycleComponent & LiveData/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Android屏幕适配" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/Android屏幕适配/">Android屏幕适配</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Android屏幕适配/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Android屏幕适配"><a href="#Android屏幕适配" class="headerlink" title="Android屏幕适配"></a>Android屏幕适配</h2><h4 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h4><ol>
+<li>px 像素 pixel，由于是最小的独立显示单位，px均为整数，不会出现0.5px的情况</li>
+<li>in 表示英寸，是屏幕的物理尺寸。</li>
+<li>dpi dpi是Dots Per Inch的缩写,每英寸点数（也可以叫做  PPI（pixels per inch）），即每英寸包含像素个数，一般来说屏幕的垂直方向和水平方向的dpi是一样的，因为手机一般都使用正方形的像素点</li>
+<li>density 屏幕密度，density和dpi的关系为 density = dpi/160</li>
+<li>dp 也即dip，设备独立像素，device independent pixels的缩写，Android特有的单位，在屏幕密度dpi = 160屏幕上，1dp = 1px</li>
+<li>sp 和dp很类似，一般用来设置字体大小，和dp的区别是它可以根据用户的字体大小偏好来缩放。</li>
+</ol>
+<h3 id="Android-Drawable"><a href="#Android-Drawable" class="headerlink" title="Android Drawable"></a>Android Drawable</h3><ul>
+<li>drawable-ldpi (dpi=120, density=0.75)</li>
+<li>drawable-mdpi (dpi=160, density=1)</li>
+<li>drawable-hdpi (dpi=240, density=1.5)</li>
+<li>drawable-xhdpi (dpi=320, density=2)</li>
+<li>drawable-xxhdpi (dpi=480, density=3)</li>
+<li></li>
+</ul>
+<h3 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h3><h2 id="自动渲染的概念，"><a href="#自动渲染的概念，" class="headerlink" title="- 自动渲染的概念，"></a>- 自动渲染的概念，</h2><p> Android SDK会自动屏幕尺寸选择对应的资源文件进行渲染，如SDK检测到你手机dpi是160的话会优先到drawable-mdpi文件夹下找对应的图片资源，注意只是优先，假设你手机dpi是160，但是你只在xhpdi文件夹下有对应的图片资源文件，程序一样可以正常运行。所以理论上来说只需要提供一种规格的图片资源就ok了，如果只提供ldpi规格的图片，对于大分辨率的手机如果把图片放大就会不清晰，所以需要提供一套你需要支持的最大dpi的图片，这样即使用户的手机分辨率很小，这样图片缩小依然很清晰。</p>
+<h2 id="wrap-content-VS-dp"><a href="#wrap-content-VS-dp" class="headerlink" title="- wrap_content VS dp"></a>- wrap_content VS dp</h2><p>wrap_content和dp都是在Android开发中应该经常用到的，然后它们冥冥中是有关系的。假设你看了这篇文章后都是统一有xhdpi的资源，那么你用wrap_content完全没有问题，Android会自动为其他规格的dpi屏幕适配,比如你在xhdpi放了一张120X120px大小的图片，那么在在hdpi屏幕上显示的就只有120/2*1.5=90px大小，但是如果你不小心同样把这张图片也放入了mdpi了，这个时候用wrap_content显示就会有问题，具体看下面的例子：例如假设你只在drawable_xhdpi文件夹下放了test图片，xhdpi的设备会去xhdpi文件夹下找到test图片并直接显示，而mdpi的设备优先会去mdpi文件夹里查找test图片，但是没找到，最后在xhdpi文件夹下找到，然后会自动根据density计算并缩放显示出来，实际显示出来的大小是120/2=60px, 所以整体的显示比例才会看起来比较正常</p>
+<h3 id="适配方案之百分比适配法"><a href="#适配方案之百分比适配法" class="headerlink" title="适配方案之百分比适配法"></a>适配方案之百分比适配法</h3><h4 id="初级百分比"><a href="#初级百分比" class="headerlink" title="初级百分比"></a>初级百分比</h4><p>生成一堆资源文件，然后我们根据一个基准，为基准的意思就是：</p>
+<ul>
+<li>宽度为320，将任何分辨率的宽度分为320份，取值为x1-x320</li>
+<li>高度为480，将任何分辨率的高度分为480份，取值为y1-y480</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20150503174449732" alt="image"></p>
+<p>屏幕所有的宽度和高度都以x、y去计算</p>
+<p>生成的代码如下<br><a href="http://blog.csdn.net/lmj623565791/article/details/45460089" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/45460089</a></p>
+<h4 id="后来google出了support库"><a href="#后来google出了support库" class="headerlink" title="后来google出了support库"></a>后来google出了support库</h4><p>PercentRelativeLayout、PercentFrameLayout</p>
+<p>支持的属性有：</p>
+<p>layout_widthPercent、layout_heightPercent、<br>layout_marginPercent、layout_marginLeftPercent、<br>layout_marginTopPercent、layout_marginRightPercent、<br>layout_marginBottomPercent、layout_marginStartPercent、layout_marginEndPercent。</p>
+<p>可以看到支持宽高，以及margin。<br>使用方法<br><a href="http://blog.csdn.net/lmj623565791/article/details/46695347" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/46695347</a></p>
+<h4 id="最后google废弃了这个库"><a href="#最后google废弃了这个库" class="headerlink" title="最后google废弃了这个库"></a>最后google废弃了这个库</h4><p>改为使用<br><strong>ConstraintLayout</strong> 约束布局，目前AS中的默认布局，支持百分比，效率更高，解决屏幕的适配问题</p>
+<h3 id="Google官方提供的适配方法"><a href="#Google官方提供的适配方法" class="headerlink" title="Google官方提供的适配方法"></a>Google官方提供的适配方法</h3><p>参考文章：<br><a href="http://blog.csdn.net/guolin_blog/article/details/8830286" target="_blank" rel="external">http://blog.csdn.net/guolin_blog/article/details/8830286</a></p>
+<ul>
+<li><p>让你的布局能充分的自适应屏幕 </p>
+<blockquote>
+<p>使用 “wrap_content” 和 “match_parent”</p>
+</blockquote>
+</li>
+<li><p>根据屏幕的配置来加载合适的UI布局</p>
+<blockquote>
+<p><strong>使用Size限定符</strong></p>
+<ul>
+<li>res/layout/main.xml，single-pane(默认)布局：</li>
+<li>res/layout-large/main.xml，two-pane布局：</li>
+<li>请注意第二个布局的目录名中包含了large限定符，那些被定义为大屏的设备(比如7寸以上的平板)会自动加载此布局，而小屏设备会加载另一个默认的布局。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p><strong>使用Smallest-width限定符</strong></p>
+<p>使用Size限定符有一个问题会让很多程序员感到头疼，large到底是指多大呢？很多应用程序都希望能够更自由地为不同屏幕设备加载不同的布局，不管它们是不是被系统认定为”large”。这就是Android为什么在3.2以后引入了”Smallest-width”限定符。</p>
+<p>Smallest-width限定符允许你设定一个具体的最小值(以dp为单位)来指定屏幕。例如，7寸的平板最小宽度是600dp，所以如果你想让你的UI在这种屏幕上显示two pane，在更小的屏幕上显示single pane，你可以使用sw600dp来表示你想在600dp以上宽度的屏幕上使用two pane模式。</p>
+<ul>
+<li>res/layout/main.xml，single-pane(默认)布局：</li>
+<li>res/layout-sw600dp/main.xml，two-pane布局：</li>
+<li>这意味着，那些最小屏幕宽度大于600dp的设备会选择layout-sw600dp/main.xml(two-pane)布局，而更小屏幕的设备将会选择layout/main.xml(single-pane)布局。</li>
+<li>然而，使用早于Android 3.2系统的设备将无法识别sw600dp这个限定符，所以你还是同时需要使用large限定符。这样你就需要在res/layout-large和res/layout-sw600dp目录下都添加一个相同的main.xml。下节你将会看到如何避免重复定义这种布局的技巧。</li>
+</ul>
+<p><strong>使用布局别名</strong></p>
+<ul>
+<li>res/layout/main.xml, single-pane布局</li>
+<li>res/layout/main_twopanes.xml, two-pane布局</li>
+</ul>
+<p>加入以下两个文件：<br>res/values-large/layout.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;resources&gt;  </div><div class="line">    &lt;item name=&quot;main&quot; type=&quot;layout&quot;&gt;@layout/main_twopanes&lt;/item&gt;  </div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure></p>
+<p>res/values-sw600dp/layout.xml:</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;resources&gt;  </div><div class="line">    &lt;item name=&quot;main&quot; type=&quot;layout&quot;&gt;@layout/main_twopanes&lt;/item&gt;  </div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>使用Orientation限定符</strong></p>
+<ul>
+<li>res/values/layouts.xml:</li>
+<li>res/values-sw600dp-land/layouts.xml:</li>
+<li>res/values-sw600dp-port/layouts.xml:</li>
+<li>res/values-large-land/layouts.xml:</li>
+<li>res/values-large-port/layouts.xml:</li>
+</ul>
+<p><strong>使用Nine-Patch图片</strong><br>使用可拉伸的图</p>
+</blockquote>
+<ul>
+<li>确保正确的布局应用在正确的设备屏幕上</li>
+<li>提供可以根据屏幕大小自动伸缩的图片</li>
+</ul>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="http://stormzhang.com/android/2014/05/16/android-screen-adaptation/" target="_blank" rel="external">Stormzhang-屏幕适配的知识点</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/12/Android屏幕适配/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Activity四种启动模式以及taskAffinity的使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="四种启动模式"><a href="#四种启动模式" class="headerlink" title="四种启动模式"></a>四种启动模式</h2><ol>
+<li>standard 标准模式（默认的模式）<blockquote>
+<p>每次启动都会在当前的任务栈中生成一个新的Activity实例</p>
+</blockquote>
+</li>
+<li>singleTop 栈顶单一模式<blockquote>
+<p>如果此Activity已经存在于栈顶，则直接走onNewIntent，onResume ,不会再创建实例（不会走onCreate onStart）;如果此Activity不存于栈顶，栈的中间位置，则类似于standard新生成一个实例</p>
+</blockquote>
+</li>
+<li>singleTask 栈中唯一模式<blockquote>
+<p>如果此Activity已经存在于栈中，则把该Activity之上所有其他的Activity全部弹出栈（销毁，会走onDestroy方法），调用此Acitivity的onNewIntent、onReume、onStart</p>
+</blockquote>
+</li>
+<li>singleInstance 全局唯一模式<blockquote>
+<p>独享一个栈空间，全部如果存在此Activity 则走onNewIntent 和 onResume ,因为此模式是独享新栈，在此Activity上面再启动其他的activity的时候，会回到之前的栈，如果此时再back，会在前一个栈走完后，才会回到新的此Activity的栈</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h2><p>当开始一个没有Intent.FLAG_ACTIVITY_NEW_TASK标志的Activity时，任务共用性affinities不会影响将会运行该新活动的Task:它总是运行在启动它的Task里。但是，如果使用了NEW_TASK标志，那么共用性（affinity）将被用来判断是否已经存在一个有相同共用性（affinity）的Task。如果是这样，这项Task将被切换到前面而新的Activity会启动于这个Task的顶层。</p>
+<p>跟 Task 有关的 manifest文件中Activity的特性值介绍<br>android:allowTaskReparenting<br>    用来标记Activity能否从启动的Task移动到有着affinity的Task（当这个Task进入到前台时）</p>
+<p>   “true”，表示能移动，“false”，表示它必须呆在启动时呆在的那个Task里。</p>
+<p>如果这个特性没有被设定，设定到<application>元素上的allowTaskReparenting特性的值会应用到Activity上。默认值为“false”。</application></p>
+<p>一般来说，当Activity启动后，它就与启动它的Task关联，并且在那里耗尽它的整个生命周期。当当前的Task不再显示时，你可以使用这个特性来强制Activity移动到有着affinity的Task中。典型用法是：把一个应用程序的Activity移到另一个应用程序的主Task中。 </p>
+<h2 id="gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。"><a href="#gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。" class="headerlink" title="&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。"></a>&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。</h2><blockquote>
+<p>Actvity的affinity是由taskAffinity特性定义的。Task的affinity是通过读取根Activity的affinity决定。因此，根Activity总是位于相同affinity的Task里。由于启动模式为“singleTask”和“singleInstance”的Activity只能位于Task的底部，因此，重新宿主只能限于“standard”和“singleTop”模式。</p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-2017-8-30-andrew-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -935,443 +1330,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/08/30/2017-8-30-andrew-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2017-8-29-md-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/29/2017-8-29-md-1/">Android Material Design(1)</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/29/2017-8-29-md-1/" class="archive-article-date">
-  	<time datetime="2017-08-28T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p> MD风格是Google在2014 I/O大会发布的一整套的设计方案，除了针对移动开发，还可以针对PC、网页等<br> 分三期学习MD</p>
-<ol>
-<li>Material Design 设计规范详解</li>
-<li>Android Material Design的全部API介绍和使用(根据情况可分为多节)</li>
-<li>Android MD的最佳实践 (根据情况可以分为多节)</li>
-</ol>
-<h2 id="Material-Design-设计规范"><a href="#Material-Design-设计规范" class="headerlink" title="Material Design 设计规范"></a>Material Design 设计规范</h2><p>Material Design，中文名：材料设计语言，是由Google推出的全新的设计语言，谷歌表示，这种设计语言旨在为手机、平板电脑、台式机和“其他平台”提供更一致、更广泛的“外观和感觉”。</p>
-<h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><p>Material design的核心思想，就是把物理世界的体验带进屏幕。去掉现实中的杂质和随机性，保留其最原始纯净的形态、空间关系、变化与过渡，配合虚拟世界的灵活特性，还原最贴近真实的体验，达到简洁与直观的效果。</p>
-<h3 id="材质与空间"><a href="#材质与空间" class="headerlink" title="材质与空间"></a>材质与空间</h3><p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-1.gif" alt="image"></p>
-<p>Material design中，最重要的信息载体就是魔法纸片。纸片层叠、合并、分离，拥有现实中的厚度、惯性和反馈，同时拥有液体的一些特性，能够自由伸展变形</p>
-<h3 id="动画"><a href="#动画" class="headerlink" title="动画"></a>动画</h3><ol>
-<li>Material design重视动画效果，它反复强调一点：动画不只是装饰，它有含义，能表达元素、界面之间的关系，具备功能上的作用。</li>
-<li>动画要贴近真实世界，就要重视easing。物理世界中的运动和变化都是有加速和减速过程的，忽然开始、忽然停止的匀速动画显得机械而不真实。考虑动画的easing，要先考虑它在现实世界中的运动规律。</li>
-</ol>
-<p><strong>水波反馈</strong></p>
-<p>所有可点击的元素，都应该有这样的反馈效果。通过这个动画，将点击的位置与所操作的元素关联起来，体现了Material design动画的功能性。</p>
-<p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-3.gif" alt="image"><br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-4.gif" alt="image"></p>
-<p><strong>转场效果馈</strong></p>
-<p>通过过渡动画，表达界面之间的空间与层级关系，并且跨界面传递信息。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-6.gif" alt="image"></p>
-<p>从父界面进入子界面，需要抬升子元素的海拔高度，并展开至整个屏幕，反之亦然。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-7.gif" alt="image"></p>
-<p>相似元素的运动，要符合统一的规律。</p>
-<p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-9.gif" alt="image"></p>
-<p>多个相似元素，动画的设计要有先后次序，起到引导视线的作用。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-8.gif" alt="image"></p>
-<p><strong>细节动画</strong></p>
-<p>通过图标的变化和一些细节来达到令人愉悦的效果。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-10.gif" alt="image"></p>
-<p><strong>颜色</strong></p>
-<p>颜色不宜过多。选取一种主色、一种辅助色（非必需），在此基础上进行明度、饱和度变化，构成配色方案。</p>
-<p>颜色方案可以使用现成的工具</p>
-<ol>
-<li><a href="http://www.uisdc.com/3-websites-design-online" target="_blank" rel="external">配色方案</a></li>
-<li><a href="https://www.materialpalette.com/orange/deep-orange" target="_blank" rel="external">Material Palette</a></li>
-<li><a href="http://calltoidea.com/" target="_blank" rel="external">APP设计神器</a></li>
-</ol>
-<p><strong>图标</strong></p>
-<ol>
-<li>桌面图标<ul>
-<li>桌面图标尺寸是48dp X 48dp。</li>
-<li>桌面图标建议模仿现实中的折纸效果，通过扁平色彩表现空间和光影</li>
-</ul>
-</li>
-<li>小图标<ul>
-<li>优先使用material design默认图标。设计小图标时，使用最简练的图形来表达，图形不要带空间感。</li>
-<li>小图标尺寸是24dp X 24dp。图形限制在中央20dp X 20dp区域内。</li>
-<li>小图标同样有栅格系统。线条、空隙尽量保持2dp宽，圆角半径2dp。特殊情况相应调整。</li>
-</ul>
-</li>
-</ol>
-<p><strong>图片</strong></p>
-<ol>
-<li>描述具体事物，优先使用照片。然后可以考虑使用插画。</li>
-<li>图片上的文字，需要淡淡的遮罩确保其可读性。深色的遮罩透明度在20%-40%之间，浅色的遮罩透明度在40%-60%之间。</li>
-<li>对于带有文字的大幅图片，遮罩文字区域，不要遮住整张图片。</li>
-<li>可以使用半透明的主色盖住图片。</li>
-</ol>
-<p><strong>提取颜色</strong> </p>
-<ol>
-<li>Android L可以从图片中提取主色，运用在其他UI元素上。</li>
-<li>图片的加载过程非常讲究，透明度、曝光度、饱和度3个指标依次变化，效果相当细腻。</li>
-</ol>
-<p><strong>文字</strong></p>
-<ol>
-<li>英文字体使用Roboto，中文字体使用Noto。</li>
-<li>Roboto有6种字重：Thin、Light、Regular、Medium、Bold 和 Black。</li>
-<li>常用字号：<ul>
-<li>12sp 小字提示</li>
-<li>14sp（桌面端13sp） 正文/按钮文字</li>
-<li>16sp（桌面端15sp） 小标题</li>
-<li>20sp Appbar文字</li>
-<li>24sp 大标题</li>
-<li>34sp/45sp/56sp/112sp 超大号文字\</li>
-</ul>
-</li>
-<li>长篇幅正文，每行建议60字符（英文）左右。短文本，建议每行30字符（英文）左右。</li>
-</ol>
-<p><strong>布局</strong></p>
-<ol>
-<li>所有可操作元素最小点击区域尺寸：48dp X 48dp。</li>
-<li>栅格系统的最小单位是8dp，一切距离、尺寸都应该是8dp的整数倍。以下是一些常见的尺寸与距离：<ul>
-<li>顶部状态栏高度：24dp</li>
-<li>Appbar最小高度：56dp</li>
-<li>底部导航栏高度：48dp</li>
-<li>悬浮按钮尺寸：56x56dp/40x40dp</li>
-<li>用户头像尺寸：64x64dp/40x40dp</li>
-<li>小图标点击区域：48x48dp</li>
-<li>侧边抽屉到屏幕右边的距离：56dp</li>
-<li>卡片间距：8dp</li>
-<li>分隔线上下留白：8dp</li>
-<li>大多元素的留白距离：16dp</li>
-<li>屏幕左右对齐基线：16dp</li>
-<li>文字左侧对齐基线：72dp</li>
-</ul>
-</li>
-<li>另外注意56dp这个数字，许多尺寸可变的控件，比如对话框、菜单等，宽度都可以按56的整数倍来设计。<br>还有非常多规范，不详细列举，遵循8dp栅格很容易找到适合的尺寸与距离。平板与PC上留白更多，距离与尺寸要相应增大。 </li>
-</ol>
-<p><strong>组件</strong><br>Bottom sheets 一般有两种，一种是可以滚动的列表， 一种是网格<br>第一种：<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-34.png" alt="image"></p>
-<p>第二种：</p>
-<p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-37.png" alt="image"></p>
-<p><strong>Buttons</strong></p>
-<ol>
-<li>按钮分为悬浮按钮、凸起按钮和扁平按钮3种。重要性如下递减：<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-43.png" alt="image"></li>
-</ol>
-<ul>
-<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-40.png" alt="image"> </li>
-<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-41.png" alt="image"> </li>
-<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-42.png" alt="image">\</li>
-<li>最重要且随处用到的操作，建议使用悬浮按钮。信息较多时，选用凸起按钮可以有效突出重要操作，但注意纸片不要叠太多层。扁平按钮适合用在简单的界面，例如对话框中。</li>
-<li>使用悬浮按钮要遵循以下规则：<ul>
-<li>建议只用一个悬浮按钮</li>
-<li>悬浮按钮可以贴在纸片边缘或者接缝处，但不要贴在对话框、侧边抽屉和菜单的边缘</li>
-<li>悬浮按钮不能被其他元素盖住，也不能挡住其他按钮</li>
-<li>列表滚动至底部时，悬浮按钮应该隐藏，防止它挡住列表项</li>
-<li>悬浮按钮的位置不能随意摆放，可以贴着左右两边的对齐基线 </li>
-<li>悬浮按钮通常触发正向的操作，添加、创建、收藏之类。不能触发负面、破坏性或不重要的操作，也不应该有数字角标。下图就是悬浮按钮的错误使用：</li>
-<li><strong>正确用法</strong> </li>
-<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-44.png" alt="image"><br><strong>错误用法</strong> </li>
-<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-45.png" alt="image"><br><strong>Cards布局</strong><br>在以下情况考虑使用卡片：</li>
-</ul>
-</li>
-</ul>
-<ol>
-<li>同时展现多种不同内容</li>
-<li>卡片内容之间不需要进行比较</li>
-<li>包含了长度不确定的内容，比如评论</li>
-<li>包含丰富的内容与操作项，比如赞、滚动条、评论</li>
-<li>本该是列表，但文字超过3行</li>
-<li>本该是网格，但需要展现更多文字</li>
-<li>卡片最多有两块操作区域。辅助操作区至多包含两个操作项，更多操作需要使用下拉菜单。其余部分都是主操作区。</li>
-</ol>
-<p>… 还有很多关于控件相关的使用，这里不多介绍，主要是了解，主要是针对设计人员，针对开发人员，重点还是API的使用</p>
-<p>学习网址：<br><a href="http://www.uisdc.com/comprehensive-material-design-note" target="_blank" rel="external">http://www.uisdc.com/comprehensive-material-design-note</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/MD/" class="article-tag-list-link color3">MD</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/29/2017-8-29-md-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2017-8-28-tensor-flow-2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/28/2017-8-28-tensor-flow-2/">算法和数理统计(1)</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/28/2017-8-28-tensor-flow-2/" class="archive-article-date">
-  	<time datetime="2017-08-27T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="补习算法和数学"><a href="#补习算法和数学" class="headerlink" title="补习算法和数学"></a>补习算法和数学</h2><p>在学习机器学习的过程中，几乎全部的算法都是数学公式和概念为基准的，尤其以《数理统计和概率论》为主。所以从今天开始为期一个月的时间补习算法和数学概念，全部的学习过程会同步更新的到博客。大概计划是 每周三到五篇博客，数学为主，算法为辅。算法主要基于Python实现。加油！</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/算法和数理统计/" class="article-tag-list-link color3">算法和数理统计</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/28/2017-8-28-tensor-flow-2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2017-8-22-tensor-flow-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/22/2017-8-22-tensor-flow-1/">TensorFlow学习笔记(1)</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/22/2017-8-22-tensor-flow-1/" class="archive-article-date">
-  	<time datetime="2017-08-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="TensorFlow-来源于百度百科"><a href="#TensorFlow-来源于百度百科" class="headerlink" title="TensorFlow(来源于百度百科)"></a>TensorFlow(来源于百度百科)</h1><ol>
-<li>TensorFlow是谷歌基于DistBelief进行研发的第二代人工智能学习系统，其命名来源于本身的运行原理。Tensor（张量）意味着N维数组，Flow（流）意味着基于数据流图的计算，TensorFlow为张量从流图的一端流动到另一端计算过程。TensorFlow是将复杂的数据结构传输至人工智能神经网中进行分析和处理过程的系统。</li>
-<li>TensorFlow可被用于语音识别或图像识别等多项机器深度学习领域，对2011年开发的深度学习基础架构DistBelief进行了各方面的改进，它可在小到一部智能手机、大到数千台数据中心服务器的各种设备上运行。TensorFlow将完全开源，任何人都可以用。</li>
-<li>我个人理解 TensorFlow 更像一个集成了AI开发的平台，协助把大规模的数据运算分散到大规模的设备中去，这其中融入了Google对于AI的一个理解，在这个框架内引入了第三方的库，让AI开发有一个统一的标准</li>
-</ol>
-<h1 id="Windows安装TensorFlow"><a href="#Windows安装TensorFlow" class="headerlink" title="Windows安装TensorFlow"></a>Windows安装TensorFlow</h1><p>TensorFlow 是目前来说，对于个人开发者来说，是一个唯一可靠的平台，鉴于目前各方面文档都不全，普通的小白开发者入门极其困难；从最开始的安装解决就有很多坑，大部分人在第一步就掉坑里爬不上来；不管学习什么都要持之以恒，只要确定了这门技术有意义，就要有一门心思走到底的决心；下面介绍一下Window上面安装TensorFlow的步骤，以及遇到的问题</p>
-<p>参考网址<a href="http://blog.csdn.net/u010099080/article/details/53418159" target="_blank" rel="external">点击查看</a></p>
-<p>该教程中指出了大体的步骤，但是在实际操作中可能还会有其它的问题！</p>
-<ol>
-<li><p>安装文件准备（涉及到的资源会上传 百度云盘）</p>
-<ul>
-<li>TensorFlow 1.3 whl文件（pip安装文件）</li>
-<li>Python 3.6 和 pip</li>
-<li>CUDA 8.0 和 cuDNN 6.0</li>
-<li>其它的第三方库</li>
-<li>链接：<a href="http://pan.baidu.com/s/1jHJN3ts" target="_blank" rel="external">http://pan.baidu.com/s/1jHJN3ts</a> 密码：yw1z</li>
-</ul>
-</li>
-<li><p>安装Python和Pip</p>
-<ul>
-<li>Python是一种跨平台的脚本开发语言</li>
-<li>Pip 基于Python的第三方库管理平台</li>
-<li>直接下载资源里面的Python文件，Python3.6里面已经集成了Pip，点击安装即可，安装过程中勾选 “Add To Path” ，会自动加入到路径中去</li>
-<li>安装完成后 执行 python –version 和 pip –version 查看是否成功</li>
-</ul>
-</li>
-<li><p>安装TensorFlow</p>
-</li>
-</ol>
-<p><strong>在线安装命令（网络状况比较好的话）</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># GPU版本</div><div class="line">pip3 install --upgrade tensorflow-gpu</div><div class="line"></div><div class="line"># CPU版本</div><div class="line">pip3 install --upgrade tensorflow</div></pre></td></tr></table></figure>
-<p><strong>离线安装</strong> </p>
-<p>因为国内墙的原因，正常情况下都是无法安装成功的，在安装过程中会不断的发现某一个第三方库下载超时，我把这里全部的稍微大一点的包 都已经下载好，直接执行命令进行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">pip install numpy-1.12.1-cp36-none-win_amd64.whl</div><div class="line">pip install scipy-0.19.0-cp36-cp36m-win_amd64.whl</div><div class="line">pip install tensorflow_tensorboard-0.1.4-py3-none-any.whl</div><div class="line">pip install tensorflow-1.3.0-cp36-cp36m-win_amd64.whl</div><div class="line"></div><div class="line">//把上面四个命令都执行完毕后，再执行下面这个命令，基本上都能一次性成功</div><div class="line">pip install tensorflow_gpu-1.3.0-cp36-cp36m-win_amd64.whl</div></pre></td></tr></table></figure>
-<ol>
-<li><p>安装Cuba 和 cuDnn</p>
-<ul>
-<li>Cuba 直接打开可执行文件，安装即可</li>
-<li>cuDnn 解压后，把bin加入系统的Path中</li>
-<li>注意cuDnn下载需要注册账号，并且注意选择正确的版本（也可以直接使用资源里面的）</li>
-</ul>
-</li>
-<li><p>安装完成后出现的错误 </p>
-</li>
-</ol>
-<p><strong>numpy 库无法使用</strong><br>一般会伴随着“ImportError: DLL load failed: 找不到指定的模块。”<br>如果是在线安装，或者使用pypi提供的库，好像都是有问题的，解决的方法就是使用我提供的numpy库，采用离线的方式安装 numpy</p>
-<p><strong>ImportError: No module named ‘_pywrap_tensorflow_internal’问题</strong><br>一般都是cuDnn的库版本错误，或者设置Path错误，这里注意，设置过环境变量后，需要退出cmd，重新进入才会生效</p>
-<p><strong>某一个库下载超时</strong></p>
-<p>把下载失败的文件名复制下来，在这个网址里面搜索<br><a href="https://pypi.python.org/pypi/" target="_blank" rel="external">https://pypi.python.org/pypi/</a></p>
-<ol>
-<li>执行结果</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">import tensorflow as tf</div><div class="line">a = tf.random_normal((100, 100))</div><div class="line">b = tf.random_normal((100, 500))</div><div class="line">c = tf.matmul(a, b)</div><div class="line">//产生a，b两个矩阵，两个矩阵相乘，在GPU中并行处理</div><div class="line">sess = tf.InteractiveSession()</div><div class="line">sess.run(c)</div></pre></td></tr></table></figure>
-<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/tensor_flow.png" alt="image"></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/AI/" class="article-tag-list-link color3">AI</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/22/2017-8-22-tensor-flow-1/">展开全文 >></a>
         </p>
       
 

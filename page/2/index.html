@@ -157,6 +157,443 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-2017-8-29-md-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/29/2017-8-29-md-1/">Android Material Design(1)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/29/2017-8-29-md-1/" class="archive-article-date">
+  	<time datetime="2017-08-28T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p> MD风格是Google在2014 I/O大会发布的一整套的设计方案，除了针对移动开发，还可以针对PC、网页等<br> 分三期学习MD</p>
+<ol>
+<li>Material Design 设计规范详解</li>
+<li>Android Material Design的全部API介绍和使用(根据情况可分为多节)</li>
+<li>Android MD的最佳实践 (根据情况可以分为多节)</li>
+</ol>
+<h2 id="Material-Design-设计规范"><a href="#Material-Design-设计规范" class="headerlink" title="Material Design 设计规范"></a>Material Design 设计规范</h2><p>Material Design，中文名：材料设计语言，是由Google推出的全新的设计语言，谷歌表示，这种设计语言旨在为手机、平板电脑、台式机和“其他平台”提供更一致、更广泛的“外观和感觉”。</p>
+<h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><p>Material design的核心思想，就是把物理世界的体验带进屏幕。去掉现实中的杂质和随机性，保留其最原始纯净的形态、空间关系、变化与过渡，配合虚拟世界的灵活特性，还原最贴近真实的体验，达到简洁与直观的效果。</p>
+<h3 id="材质与空间"><a href="#材质与空间" class="headerlink" title="材质与空间"></a>材质与空间</h3><p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-1.gif" alt="image"></p>
+<p>Material design中，最重要的信息载体就是魔法纸片。纸片层叠、合并、分离，拥有现实中的厚度、惯性和反馈，同时拥有液体的一些特性，能够自由伸展变形</p>
+<h3 id="动画"><a href="#动画" class="headerlink" title="动画"></a>动画</h3><ol>
+<li>Material design重视动画效果，它反复强调一点：动画不只是装饰，它有含义，能表达元素、界面之间的关系，具备功能上的作用。</li>
+<li>动画要贴近真实世界，就要重视easing。物理世界中的运动和变化都是有加速和减速过程的，忽然开始、忽然停止的匀速动画显得机械而不真实。考虑动画的easing，要先考虑它在现实世界中的运动规律。</li>
+</ol>
+<p><strong>水波反馈</strong></p>
+<p>所有可点击的元素，都应该有这样的反馈效果。通过这个动画，将点击的位置与所操作的元素关联起来，体现了Material design动画的功能性。</p>
+<p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-3.gif" alt="image"><br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-4.gif" alt="image"></p>
+<p><strong>转场效果馈</strong></p>
+<p>通过过渡动画，表达界面之间的空间与层级关系，并且跨界面传递信息。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-6.gif" alt="image"></p>
+<p>从父界面进入子界面，需要抬升子元素的海拔高度，并展开至整个屏幕，反之亦然。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-7.gif" alt="image"></p>
+<p>相似元素的运动，要符合统一的规律。</p>
+<p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-9.gif" alt="image"></p>
+<p>多个相似元素，动画的设计要有先后次序，起到引导视线的作用。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-8.gif" alt="image"></p>
+<p><strong>细节动画</strong></p>
+<p>通过图标的变化和一些细节来达到令人愉悦的效果。<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/b-10.gif" alt="image"></p>
+<p><strong>颜色</strong></p>
+<p>颜色不宜过多。选取一种主色、一种辅助色（非必需），在此基础上进行明度、饱和度变化，构成配色方案。</p>
+<p>颜色方案可以使用现成的工具</p>
+<ol>
+<li><a href="http://www.uisdc.com/3-websites-design-online" target="_blank" rel="external">配色方案</a></li>
+<li><a href="https://www.materialpalette.com/orange/deep-orange" target="_blank" rel="external">Material Palette</a></li>
+<li><a href="http://calltoidea.com/" target="_blank" rel="external">APP设计神器</a></li>
+</ol>
+<p><strong>图标</strong></p>
+<ol>
+<li>桌面图标<ul>
+<li>桌面图标尺寸是48dp X 48dp。</li>
+<li>桌面图标建议模仿现实中的折纸效果，通过扁平色彩表现空间和光影</li>
+</ul>
+</li>
+<li>小图标<ul>
+<li>优先使用material design默认图标。设计小图标时，使用最简练的图形来表达，图形不要带空间感。</li>
+<li>小图标尺寸是24dp X 24dp。图形限制在中央20dp X 20dp区域内。</li>
+<li>小图标同样有栅格系统。线条、空隙尽量保持2dp宽，圆角半径2dp。特殊情况相应调整。</li>
+</ul>
+</li>
+</ol>
+<p><strong>图片</strong></p>
+<ol>
+<li>描述具体事物，优先使用照片。然后可以考虑使用插画。</li>
+<li>图片上的文字，需要淡淡的遮罩确保其可读性。深色的遮罩透明度在20%-40%之间，浅色的遮罩透明度在40%-60%之间。</li>
+<li>对于带有文字的大幅图片，遮罩文字区域，不要遮住整张图片。</li>
+<li>可以使用半透明的主色盖住图片。</li>
+</ol>
+<p><strong>提取颜色</strong> </p>
+<ol>
+<li>Android L可以从图片中提取主色，运用在其他UI元素上。</li>
+<li>图片的加载过程非常讲究，透明度、曝光度、饱和度3个指标依次变化，效果相当细腻。</li>
+</ol>
+<p><strong>文字</strong></p>
+<ol>
+<li>英文字体使用Roboto，中文字体使用Noto。</li>
+<li>Roboto有6种字重：Thin、Light、Regular、Medium、Bold 和 Black。</li>
+<li>常用字号：<ul>
+<li>12sp 小字提示</li>
+<li>14sp（桌面端13sp） 正文/按钮文字</li>
+<li>16sp（桌面端15sp） 小标题</li>
+<li>20sp Appbar文字</li>
+<li>24sp 大标题</li>
+<li>34sp/45sp/56sp/112sp 超大号文字\</li>
+</ul>
+</li>
+<li>长篇幅正文，每行建议60字符（英文）左右。短文本，建议每行30字符（英文）左右。</li>
+</ol>
+<p><strong>布局</strong></p>
+<ol>
+<li>所有可操作元素最小点击区域尺寸：48dp X 48dp。</li>
+<li>栅格系统的最小单位是8dp，一切距离、尺寸都应该是8dp的整数倍。以下是一些常见的尺寸与距离：<ul>
+<li>顶部状态栏高度：24dp</li>
+<li>Appbar最小高度：56dp</li>
+<li>底部导航栏高度：48dp</li>
+<li>悬浮按钮尺寸：56x56dp/40x40dp</li>
+<li>用户头像尺寸：64x64dp/40x40dp</li>
+<li>小图标点击区域：48x48dp</li>
+<li>侧边抽屉到屏幕右边的距离：56dp</li>
+<li>卡片间距：8dp</li>
+<li>分隔线上下留白：8dp</li>
+<li>大多元素的留白距离：16dp</li>
+<li>屏幕左右对齐基线：16dp</li>
+<li>文字左侧对齐基线：72dp</li>
+</ul>
+</li>
+<li>另外注意56dp这个数字，许多尺寸可变的控件，比如对话框、菜单等，宽度都可以按56的整数倍来设计。<br>还有非常多规范，不详细列举，遵循8dp栅格很容易找到适合的尺寸与距离。平板与PC上留白更多，距离与尺寸要相应增大。 </li>
+</ol>
+<p><strong>组件</strong><br>Bottom sheets 一般有两种，一种是可以滚动的列表， 一种是网格<br>第一种：<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-34.png" alt="image"></p>
+<p>第二种：</p>
+<p><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-37.png" alt="image"></p>
+<p><strong>Buttons</strong></p>
+<ol>
+<li>按钮分为悬浮按钮、凸起按钮和扁平按钮3种。重要性如下递减：<br><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-43.png" alt="image"></li>
+</ol>
+<ul>
+<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-40.png" alt="image"> </li>
+<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-41.png" alt="image"> </li>
+<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-42.png" alt="image">\</li>
+<li>最重要且随处用到的操作，建议使用悬浮按钮。信息较多时，选用凸起按钮可以有效突出重要操作，但注意纸片不要叠太多层。扁平按钮适合用在简单的界面，例如对话框中。</li>
+<li>使用悬浮按钮要遵循以下规则：<ul>
+<li>建议只用一个悬浮按钮</li>
+<li>悬浮按钮可以贴在纸片边缘或者接缝处，但不要贴在对话框、侧边抽屉和菜单的边缘</li>
+<li>悬浮按钮不能被其他元素盖住，也不能挡住其他按钮</li>
+<li>列表滚动至底部时，悬浮按钮应该隐藏，防止它挡住列表项</li>
+<li>悬浮按钮的位置不能随意摆放，可以贴着左右两边的对齐基线 </li>
+<li>悬浮按钮通常触发正向的操作，添加、创建、收藏之类。不能触发负面、破坏性或不重要的操作，也不应该有数字角标。下图就是悬浮按钮的错误使用：</li>
+<li><strong>正确用法</strong> </li>
+<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-44.png" alt="image"><br><strong>错误用法</strong> </li>
+<li><img src="http://image.uisdc.com/wp-content/uploads/2014/12/a-45.png" alt="image"><br><strong>Cards布局</strong><br>在以下情况考虑使用卡片：</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>同时展现多种不同内容</li>
+<li>卡片内容之间不需要进行比较</li>
+<li>包含了长度不确定的内容，比如评论</li>
+<li>包含丰富的内容与操作项，比如赞、滚动条、评论</li>
+<li>本该是列表，但文字超过3行</li>
+<li>本该是网格，但需要展现更多文字</li>
+<li>卡片最多有两块操作区域。辅助操作区至多包含两个操作项，更多操作需要使用下拉菜单。其余部分都是主操作区。</li>
+</ol>
+<p>… 还有很多关于控件相关的使用，这里不多介绍，主要是了解，主要是针对设计人员，针对开发人员，重点还是API的使用</p>
+<p>学习网址：<br><a href="http://www.uisdc.com/comprehensive-material-design-note" target="_blank" rel="external">http://www.uisdc.com/comprehensive-material-design-note</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/MD/" class="article-tag-list-link color3">MD</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/29/2017-8-29-md-1/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-2017-8-28-tensor-flow-2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/28/2017-8-28-tensor-flow-2/">算法和数理统计(1)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/28/2017-8-28-tensor-flow-2/" class="archive-article-date">
+  	<time datetime="2017-08-27T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="补习算法和数学"><a href="#补习算法和数学" class="headerlink" title="补习算法和数学"></a>补习算法和数学</h2><p>在学习机器学习的过程中，几乎全部的算法都是数学公式和概念为基准的，尤其以《数理统计和概率论》为主。所以从今天开始为期一个月的时间补习算法和数学概念，全部的学习过程会同步更新的到博客。大概计划是 每周三到五篇博客，数学为主，算法为辅。算法主要基于Python实现。加油！</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/算法和数理统计/" class="article-tag-list-link color3">算法和数理统计</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/28/2017-8-28-tensor-flow-2/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-2017-8-22-tensor-flow-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/22/2017-8-22-tensor-flow-1/">TensorFlow学习笔记(1)</a>
+    </h1>
+  
+
+        
+        <a href="/2017/08/22/2017-8-22-tensor-flow-1/" class="archive-article-date">
+  	<time datetime="2017-08-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="TensorFlow-来源于百度百科"><a href="#TensorFlow-来源于百度百科" class="headerlink" title="TensorFlow(来源于百度百科)"></a>TensorFlow(来源于百度百科)</h1><ol>
+<li>TensorFlow是谷歌基于DistBelief进行研发的第二代人工智能学习系统，其命名来源于本身的运行原理。Tensor（张量）意味着N维数组，Flow（流）意味着基于数据流图的计算，TensorFlow为张量从流图的一端流动到另一端计算过程。TensorFlow是将复杂的数据结构传输至人工智能神经网中进行分析和处理过程的系统。</li>
+<li>TensorFlow可被用于语音识别或图像识别等多项机器深度学习领域，对2011年开发的深度学习基础架构DistBelief进行了各方面的改进，它可在小到一部智能手机、大到数千台数据中心服务器的各种设备上运行。TensorFlow将完全开源，任何人都可以用。</li>
+<li>我个人理解 TensorFlow 更像一个集成了AI开发的平台，协助把大规模的数据运算分散到大规模的设备中去，这其中融入了Google对于AI的一个理解，在这个框架内引入了第三方的库，让AI开发有一个统一的标准</li>
+</ol>
+<h1 id="Windows安装TensorFlow"><a href="#Windows安装TensorFlow" class="headerlink" title="Windows安装TensorFlow"></a>Windows安装TensorFlow</h1><p>TensorFlow 是目前来说，对于个人开发者来说，是一个唯一可靠的平台，鉴于目前各方面文档都不全，普通的小白开发者入门极其困难；从最开始的安装解决就有很多坑，大部分人在第一步就掉坑里爬不上来；不管学习什么都要持之以恒，只要确定了这门技术有意义，就要有一门心思走到底的决心；下面介绍一下Window上面安装TensorFlow的步骤，以及遇到的问题</p>
+<p>参考网址<a href="http://blog.csdn.net/u010099080/article/details/53418159" target="_blank" rel="external">点击查看</a></p>
+<p>该教程中指出了大体的步骤，但是在实际操作中可能还会有其它的问题！</p>
+<ol>
+<li><p>安装文件准备（涉及到的资源会上传 百度云盘）</p>
+<ul>
+<li>TensorFlow 1.3 whl文件（pip安装文件）</li>
+<li>Python 3.6 和 pip</li>
+<li>CUDA 8.0 和 cuDNN 6.0</li>
+<li>其它的第三方库</li>
+<li>链接：<a href="http://pan.baidu.com/s/1jHJN3ts" target="_blank" rel="external">http://pan.baidu.com/s/1jHJN3ts</a> 密码：yw1z</li>
+</ul>
+</li>
+<li><p>安装Python和Pip</p>
+<ul>
+<li>Python是一种跨平台的脚本开发语言</li>
+<li>Pip 基于Python的第三方库管理平台</li>
+<li>直接下载资源里面的Python文件，Python3.6里面已经集成了Pip，点击安装即可，安装过程中勾选 “Add To Path” ，会自动加入到路径中去</li>
+<li>安装完成后 执行 python –version 和 pip –version 查看是否成功</li>
+</ul>
+</li>
+<li><p>安装TensorFlow</p>
+</li>
+</ol>
+<p><strong>在线安装命令（网络状况比较好的话）</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># GPU版本</div><div class="line">pip3 install --upgrade tensorflow-gpu</div><div class="line"></div><div class="line"># CPU版本</div><div class="line">pip3 install --upgrade tensorflow</div></pre></td></tr></table></figure>
+<p><strong>离线安装</strong> </p>
+<p>因为国内墙的原因，正常情况下都是无法安装成功的，在安装过程中会不断的发现某一个第三方库下载超时，我把这里全部的稍微大一点的包 都已经下载好，直接执行命令进行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">pip install numpy-1.12.1-cp36-none-win_amd64.whl</div><div class="line">pip install scipy-0.19.0-cp36-cp36m-win_amd64.whl</div><div class="line">pip install tensorflow_tensorboard-0.1.4-py3-none-any.whl</div><div class="line">pip install tensorflow-1.3.0-cp36-cp36m-win_amd64.whl</div><div class="line"></div><div class="line">//把上面四个命令都执行完毕后，再执行下面这个命令，基本上都能一次性成功</div><div class="line">pip install tensorflow_gpu-1.3.0-cp36-cp36m-win_amd64.whl</div></pre></td></tr></table></figure>
+<ol>
+<li><p>安装Cuba 和 cuDnn</p>
+<ul>
+<li>Cuba 直接打开可执行文件，安装即可</li>
+<li>cuDnn 解压后，把bin加入系统的Path中</li>
+<li>注意cuDnn下载需要注册账号，并且注意选择正确的版本（也可以直接使用资源里面的）</li>
+</ul>
+</li>
+<li><p>安装完成后出现的错误 </p>
+</li>
+</ol>
+<p><strong>numpy 库无法使用</strong><br>一般会伴随着“ImportError: DLL load failed: 找不到指定的模块。”<br>如果是在线安装，或者使用pypi提供的库，好像都是有问题的，解决的方法就是使用我提供的numpy库，采用离线的方式安装 numpy</p>
+<p><strong>ImportError: No module named ‘_pywrap_tensorflow_internal’问题</strong><br>一般都是cuDnn的库版本错误，或者设置Path错误，这里注意，设置过环境变量后，需要退出cmd，重新进入才会生效</p>
+<p><strong>某一个库下载超时</strong></p>
+<p>把下载失败的文件名复制下来，在这个网址里面搜索<br><a href="https://pypi.python.org/pypi/" target="_blank" rel="external">https://pypi.python.org/pypi/</a></p>
+<ol>
+<li>执行结果</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">import tensorflow as tf</div><div class="line">a = tf.random_normal((100, 100))</div><div class="line">b = tf.random_normal((100, 500))</div><div class="line">c = tf.matmul(a, b)</div><div class="line">//产生a，b两个矩阵，两个矩阵相乘，在GPU中并行处理</div><div class="line">sess = tf.InteractiveSession()</div><div class="line">sess.run(c)</div></pre></td></tr></table></figure>
+<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/tensor_flow.png" alt="image"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/AI/" class="article-tag-list-link color3">AI</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/22/2017-8-22-tensor-flow-1/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-2017-8-17-view-4" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     

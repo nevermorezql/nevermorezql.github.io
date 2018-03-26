@@ -6,18 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2018 | NEVERMORE</title>
+  <title>Android屏幕适配 | NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="周庆龙个人技术博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEVERMORE">
-<meta property="og:url" content="http://yoursite.com/archives/2018/index.html">
+  <meta name="description" content="Android屏幕适配名词解释 px 像素 pixel，由于是最小的独立显示单位，px均为整数，不会出现0.5px的情况 in 表示英寸，是屏幕的物理尺寸。 dpi dpi是Dots Per Inch的缩写,每英寸点数（也可以叫做  PPI（pixels per inch）），即每英寸包含像素个数，一般来说屏幕的垂直方向和水平方向的dpi是一样的，因为手机一般都使用正方形的像素点 density">
+<meta name="keywords" content="技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android屏幕适配">
+<meta property="og:url" content="http://yoursite.com/2018/03/12/Android屏幕适配/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="周庆龙个人技术博客">
+<meta property="og:description" content="Android屏幕适配名词解释 px 像素 pixel，由于是最小的独立显示单位，px均为整数，不会出现0.5px的情况 in 表示英寸，是屏幕的物理尺寸。 dpi dpi是Dots Per Inch的缩写,每英寸点数（也可以叫做  PPI（pixels per inch）），即每英寸包含像素个数，一般来说屏幕的垂直方向和水平方向的dpi是一样的，因为手机一般都使用正方形的像素点 density">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://img.blog.csdn.net/20150503174449732">
+<meta property="og:updated_time" content="2018-03-26T03:22:26.788Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NEVERMORE">
-<meta name="twitter:description" content="周庆龙个人技术博客">
+<meta name="twitter:title" content="Android屏幕适配">
+<meta name="twitter:description" content="Android屏幕适配名词解释 px 像素 pixel，由于是最小的独立显示单位，px均为整数，不会出现0.5px的情况 in 表示英寸，是屏幕的物理尺寸。 dpi dpi是Dots Per Inch的缩写,每英寸点数（也可以叫做  PPI（pixels per inch）），即每英寸包含像素个数，一般来说屏幕的垂直方向和水平方向的dpi是一样的，因为手机一般都使用正方形的像素点 density">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20150503174449732">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -155,36 +159,118 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Android屏幕适配" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android屏幕适配
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Android屏幕适配/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Android屏幕适配"><a href="#Android屏幕适配" class="headerlink" title="Android屏幕适配"></a>Android屏幕适配</h2><h4 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h4><ol>
+<li>px 像素 pixel，由于是最小的独立显示单位，px均为整数，不会出现0.5px的情况</li>
+<li>in 表示英寸，是屏幕的物理尺寸。</li>
+<li>dpi dpi是Dots Per Inch的缩写,每英寸点数（也可以叫做  PPI（pixels per inch）），即每英寸包含像素个数，一般来说屏幕的垂直方向和水平方向的dpi是一样的，因为手机一般都使用正方形的像素点</li>
+<li>density 屏幕密度，density和dpi的关系为 density = dpi/160</li>
+<li>dp 也即dip，设备独立像素，device independent pixels的缩写，Android特有的单位，在屏幕密度dpi = 160屏幕上，1dp = 1px</li>
+<li>sp 和dp很类似，一般用来设置字体大小，和dp的区别是它可以根据用户的字体大小偏好来缩放。</li>
+</ol>
+<h3 id="Android-Drawable"><a href="#Android-Drawable" class="headerlink" title="Android Drawable"></a>Android Drawable</h3><ul>
+<li>drawable-ldpi (dpi=120, density=0.75)</li>
+<li>drawable-mdpi (dpi=160, density=1)</li>
+<li>drawable-hdpi (dpi=240, density=1.5)</li>
+<li>drawable-xhdpi (dpi=320, density=2)</li>
+<li>drawable-xxhdpi (dpi=480, density=3)</li>
+<li></li>
+</ul>
+<h3 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h3><h2 id="自动渲染的概念，"><a href="#自动渲染的概念，" class="headerlink" title="- 自动渲染的概念，"></a>- 自动渲染的概念，</h2><p> Android SDK会自动屏幕尺寸选择对应的资源文件进行渲染，如SDK检测到你手机dpi是160的话会优先到drawable-mdpi文件夹下找对应的图片资源，注意只是优先，假设你手机dpi是160，但是你只在xhpdi文件夹下有对应的图片资源文件，程序一样可以正常运行。所以理论上来说只需要提供一种规格的图片资源就ok了，如果只提供ldpi规格的图片，对于大分辨率的手机如果把图片放大就会不清晰，所以需要提供一套你需要支持的最大dpi的图片，这样即使用户的手机分辨率很小，这样图片缩小依然很清晰。</p>
+<h2 id="wrap-content-VS-dp"><a href="#wrap-content-VS-dp" class="headerlink" title="- wrap_content VS dp"></a>- wrap_content VS dp</h2><p>wrap_content和dp都是在Android开发中应该经常用到的，然后它们冥冥中是有关系的。假设你看了这篇文章后都是统一有xhdpi的资源，那么你用wrap_content完全没有问题，Android会自动为其他规格的dpi屏幕适配,比如你在xhdpi放了一张120X120px大小的图片，那么在在hdpi屏幕上显示的就只有120/2*1.5=90px大小，但是如果你不小心同样把这张图片也放入了mdpi了，这个时候用wrap_content显示就会有问题，具体看下面的例子：例如假设你只在drawable_xhdpi文件夹下放了test图片，xhdpi的设备会去xhdpi文件夹下找到test图片并直接显示，而mdpi的设备优先会去mdpi文件夹里查找test图片，但是没找到，最后在xhdpi文件夹下找到，然后会自动根据density计算并缩放显示出来，实际显示出来的大小是120/2=60px, 所以整体的显示比例才会看起来比较正常</p>
+<h3 id="适配方案之百分比适配法"><a href="#适配方案之百分比适配法" class="headerlink" title="适配方案之百分比适配法"></a>适配方案之百分比适配法</h3><h4 id="初级百分比"><a href="#初级百分比" class="headerlink" title="初级百分比"></a>初级百分比</h4><p>生成一堆资源文件，然后我们根据一个基准，为基准的意思就是：</p>
+<ul>
+<li>宽度为320，将任何分辨率的宽度分为320份，取值为x1-x320</li>
+<li>高度为480，将任何分辨率的高度分为480份，取值为y1-y480</li>
+</ul>
+<p><img src="http://img.blog.csdn.net/20150503174449732" alt="image"></p>
+<p>屏幕所有的宽度和高度都以x、y去计算</p>
+<p>生成的代码如下<br><a href="http://blog.csdn.net/lmj623565791/article/details/45460089" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/45460089</a></p>
+<h4 id="后来google出了support库"><a href="#后来google出了support库" class="headerlink" title="后来google出了support库"></a>后来google出了support库</h4><p>PercentRelativeLayout、PercentFrameLayout</p>
+<p>支持的属性有：</p>
+<p>layout_widthPercent、layout_heightPercent、<br>layout_marginPercent、layout_marginLeftPercent、<br>layout_marginTopPercent、layout_marginRightPercent、<br>layout_marginBottomPercent、layout_marginStartPercent、layout_marginEndPercent。</p>
+<p>可以看到支持宽高，以及margin。<br>使用方法<br><a href="http://blog.csdn.net/lmj623565791/article/details/46695347" target="_blank" rel="external">http://blog.csdn.net/lmj623565791/article/details/46695347</a></p>
+<h4 id="最后google废弃了这个库"><a href="#最后google废弃了这个库" class="headerlink" title="最后google废弃了这个库"></a>最后google废弃了这个库</h4><p>改为使用<br><strong>ConstraintLayout</strong> 约束布局，目前AS中的默认布局，支持百分比，效率更高，解决屏幕的适配问题</p>
+<h3 id="Google官方提供的适配方法"><a href="#Google官方提供的适配方法" class="headerlink" title="Google官方提供的适配方法"></a>Google官方提供的适配方法</h3><p>参考文章：<br><a href="http://blog.csdn.net/guolin_blog/article/details/8830286" target="_blank" rel="external">http://blog.csdn.net/guolin_blog/article/details/8830286</a></p>
+<ul>
+<li><p>让你的布局能充分的自适应屏幕 </p>
+<blockquote>
+<p>使用 “wrap_content” 和 “match_parent”</p>
+</blockquote>
+</li>
+<li><p>根据屏幕的配置来加载合适的UI布局</p>
+<blockquote>
+<p><strong>使用Size限定符</strong></p>
+<ul>
+<li>res/layout/main.xml，single-pane(默认)布局：</li>
+<li>res/layout-large/main.xml，two-pane布局：</li>
+<li>请注意第二个布局的目录名中包含了large限定符，那些被定义为大屏的设备(比如7寸以上的平板)会自动加载此布局，而小屏设备会加载另一个默认的布局。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p><strong>使用Smallest-width限定符</strong></p>
+<p>使用Size限定符有一个问题会让很多程序员感到头疼，large到底是指多大呢？很多应用程序都希望能够更自由地为不同屏幕设备加载不同的布局，不管它们是不是被系统认定为”large”。这就是Android为什么在3.2以后引入了”Smallest-width”限定符。</p>
+<p>Smallest-width限定符允许你设定一个具体的最小值(以dp为单位)来指定屏幕。例如，7寸的平板最小宽度是600dp，所以如果你想让你的UI在这种屏幕上显示two pane，在更小的屏幕上显示single pane，你可以使用sw600dp来表示你想在600dp以上宽度的屏幕上使用two pane模式。</p>
+<ul>
+<li>res/layout/main.xml，single-pane(默认)布局：</li>
+<li>res/layout-sw600dp/main.xml，two-pane布局：</li>
+<li>这意味着，那些最小屏幕宽度大于600dp的设备会选择layout-sw600dp/main.xml(two-pane)布局，而更小屏幕的设备将会选择layout/main.xml(single-pane)布局。</li>
+<li>然而，使用早于Android 3.2系统的设备将无法识别sw600dp这个限定符，所以你还是同时需要使用large限定符。这样你就需要在res/layout-large和res/layout-sw600dp目录下都添加一个相同的main.xml。下节你将会看到如何避免重复定义这种布局的技巧。</li>
+</ul>
+<p><strong>使用布局别名</strong></p>
+<ul>
+<li>res/layout/main.xml, single-pane布局</li>
+<li>res/layout/main_twopanes.xml, two-pane布局</li>
+</ul>
+<p>加入以下两个文件：<br>res/values-large/layout.xml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;resources&gt;  </div><div class="line">    &lt;item name=&quot;main&quot; type=&quot;layout&quot;&gt;@layout/main_twopanes&lt;/item&gt;  </div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure></p>
+<p>res/values-sw600dp/layout.xml:</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;resources&gt;  </div><div class="line">    &lt;item name=&quot;main&quot; type=&quot;layout&quot;&gt;@layout/main_twopanes&lt;/item&gt;  </div><div class="line">&lt;/resources&gt;</div></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>使用Orientation限定符</strong></p>
+<ul>
+<li>res/values/layouts.xml:</li>
+<li>res/values-sw600dp-land/layouts.xml:</li>
+<li>res/values-sw600dp-port/layouts.xml:</li>
+<li>res/values-large-land/layouts.xml:</li>
+<li>res/values-large-port/layouts.xml:</li>
+</ul>
+<p><strong>使用Nine-Patch图片</strong><br>使用可拉伸的图</p>
+</blockquote>
+<ul>
+<li>确保正确的布局应用在正确的设备屏幕上</li>
+<li>提供可以根据屏幕大小自动伸缩的图片</li>
+</ul>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><p><a href="http://stormzhang.com/android/2014/05/16/android-screen-adaptation/" target="_blank" rel="external">Stormzhang-屏幕适配的知识点</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/22/Handler详解/" class="archive-article-date">
-  	<time datetime="2018-03-21T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/22/Handler详解/">Handler详解</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -196,7 +282,7 @@ var _hmt = _hmt || [];
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -209,409 +295,122 @@ var _hmt = _hmt || [];
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2018/03/12/Android屏幕适配/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/20/Android Binder机制-3(ServiceManager)/" class="archive-article-date">
-  	<time datetime="2018-03-19T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-20</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2018/03/12/Room & LifecycleComponent & LiveData/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Android开发框架
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android启动模式</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/20/Android Binder机制-3(ServiceManager)/">Binder-3 (ServiceManager)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/19/App的启动流程（Android8.0） 第二篇/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/19/App的启动流程（Android8.0） 第二篇/">App启动流程（Android 8.0源码）(2)</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/19/Android Binder机制-2(参照GitYuan)/" class="archive-article-date">
-  	<time datetime="2018-03-18T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/19/Android Binder机制-2(参照GitYuan)/">Binder-2 (Gityuan Blog)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/18/Android Binder机制-1(参照Gityuan)/" class="archive-article-date">
-  	<time datetime="2018-03-17T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-18</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/18/Android Binder机制-1(参照Gityuan)/">Binder-1 (Gityuan Blog)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/16/App的启动流程（Android8.0） 第一篇/" class="archive-article-date">
-  	<time datetime="2018-03-15T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-16</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/16/App的启动流程（Android8.0） 第一篇/">App启动流程（Android 8.0源码）(1)</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/12/Room & LifecycleComponent & LiveData/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/12/Room & LifecycleComponent & LiveData/">Android开发框架</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/12/Android屏幕适配/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/12/Android屏幕适配/">Android屏幕适配</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
+  
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script>
+  var cloudTieConfig = {
+    url: "http://yoursite.com/2018/03/12/Android屏幕适配/", 
+    sourceId: "Android屏幕适配",
+    productKey: "true",
+    target: "cloud-tie-wrapper"
+  };
+</script>
+<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -634,8 +433,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
