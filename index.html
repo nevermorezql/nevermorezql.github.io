@@ -157,6 +157,190 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Android ClassLoader" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/29/Android ClassLoader/">Android ClassLoader 详解</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/29/Android ClassLoader/" class="archive-article-date">
+  	<time datetime="2018-03-28T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="热修复的关键技术"><a href="#热修复的关键技术" class="headerlink" title="热修复的关键技术"></a>热修复的关键技术</h3><hr>
+<p>现在热修复主要有两个流派，一个是阿里系的 Native层替换，一个是腾讯系的 Java层替换。Native层的替换是即时生效的，但是不能替换类，另外很多厂商定制的Native ArtMethod的结构体，兼容性不是很高。相对来说，腾讯的tinker，通过反射替换加载的类文件，稳定性高很多，但是不能即时生效。而ClassLoader是Java层热修复的核心类，只有真正的理解ClassLoader的工作原理，才能真正的理解Java层的热修复。另外通过自定义ClassLoader也可以完成很多 黑科技功能，理论上来说，这种热修复技术也可以适用于插件化、功能配置化等。</p>
+<h3 id="JAVA-ClassLoader"><a href="#JAVA-ClassLoader" class="headerlink" title="JAVA ClassLoader"></a>JAVA ClassLoader</h3><hr>
+<p>想要真正的理解Android的ClassLoader，必须先从Java原生的ClassLoader说起。正常使用的ClassLoader都是在 Java虚拟机启动的入口<strong>Launcher</strong>中初始化的，可以看下初始化的代码，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line">public class Launcher &#123;</div><div class="line">    private static Launcher launcher = new Launcher();</div><div class="line">    private static String bootClassPath =</div><div class="line">        System.getProperty(&quot;sun.boot.class.path&quot;);</div><div class="line"></div><div class="line">    public static Launcher getLauncher() &#123;</div><div class="line">        return launcher;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private ClassLoader loader;</div><div class="line"></div><div class="line">    public Launcher() &#123;</div><div class="line">        // Create the extension class loader</div><div class="line">        ClassLoader extcl;</div><div class="line">        try &#123;</div><div class="line">            extcl = ExtClassLoader.getExtClassLoader();</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            throw new InternalError(</div><div class="line">                &quot;Could not create extension class loader&quot;, e);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // Now create the class loader to use to launch the application</div><div class="line">        try &#123;</div><div class="line">            loader = AppClassLoader.getAppClassLoader(extcl);</div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            throw new InternalError(</div><div class="line">                &quot;Could not create application class loader&quot;, e);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //设置AppClassLoader为线程上下文类加载器，这个文章后面部分讲解</div><div class="line">        Thread.currentThread().setContextClassLoader(loader);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Returns the class loader used to launch the main application.</div><div class="line">     */</div><div class="line">    public ClassLoader getClassLoader() &#123;</div><div class="line">        return loader;</div><div class="line">    &#125;</div><div class="line">    /*</div><div class="line">     * The class loader used for loading installed extensions.</div><div class="line">     */</div><div class="line">    static class ExtClassLoader extends URLClassLoader &#123;&#125;</div><div class="line"></div><div class="line">/**</div><div class="line">     * The class loader used for loading from java.class.path.</div><div class="line">     * runs in a restricted security context.</div><div class="line">     */</div><div class="line">    static class AppClassLoader extends URLClassLoader &#123;&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>关键的类</li>
+</ol>
+<ul>
+<li>Bootstrap CLassloder  系统的ClassLoader，主要加载核心的类</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\resources.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\rt.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\sunrsasign.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\jsse.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\jce.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\charsets.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\jfr.jar;</div><div class="line">C:\Program Files\Java\jre1.8.0_91\classes</div></pre></td></tr></table></figure>
+<ul>
+<li>Extention ClassLoader 加载扩展路径下的类</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">C:\Program Files\Java\jre1.8.0_91\lib\ext;C:\Windows\Sun\Java\lib\ext</div></pre></td></tr></table></figure>
+<ul>
+<li>AppClassLoader<br>加载当前路径下的类</li>
+</ul>
+<ol>
+<li>类的继承关系 </li>
+</ol>
+<p><img src="https://img-blog.csdn.net/20170211112754197?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvYnJpYmx1ZQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="image"></p>
+<p>ClassLoder的源码:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div></pre></td><td class="code"><pre><div class="line">public abstract class ClassLoader &#123;</div><div class="line"></div><div class="line">// The parent class loader for delegation</div><div class="line">// Note: VM hardcoded the offset of this field, thus all new fields</div><div class="line">// must be added *after* it.</div><div class="line">private final ClassLoader parent;</div><div class="line">// The class loader for the system</div><div class="line">    // @GuardedBy(&quot;ClassLoader.class&quot;)</div><div class="line">private static ClassLoader scl;</div><div class="line"></div><div class="line">private ClassLoader(Void unused, ClassLoader parent) &#123;</div><div class="line">    this.parent = parent;</div><div class="line">    ...</div><div class="line">&#125;</div><div class="line">protected ClassLoader(ClassLoader parent) &#123;</div><div class="line">    this(checkCreateClassLoader(), parent);</div><div class="line">&#125;</div><div class="line">protected ClassLoader() &#123;</div><div class="line">    this(checkCreateClassLoader(), getSystemClassLoader());</div><div class="line">&#125;</div><div class="line">public final ClassLoader getParent() &#123;</div><div class="line">    if (parent == null)</div><div class="line">        return null;</div><div class="line">    return parent;</div><div class="line">&#125;</div><div class="line">public static ClassLoader getSystemClassLoader() &#123;</div><div class="line">    initSystemClassLoader();</div><div class="line">    if (scl == null) &#123;</div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line">    return scl;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private static synchronized void initSystemClassLoader() &#123;</div><div class="line">    if (!sclSet) &#123;</div><div class="line">        if (scl != null)</div><div class="line">            throw new IllegalStateException(&quot;recursive invocation&quot;);</div><div class="line">        sun.misc.Launcher l = sun.misc.Launcher.getLauncher();</div><div class="line">        if (l != null) &#123;</div><div class="line">            Throwable oops = null;</div><div class="line">            //通过Launcher获取ClassLoader</div><div class="line">            scl = l.getClassLoader();</div><div class="line">            try &#123;</div><div class="line">                scl = AccessController.doPrivileged(</div><div class="line">                    new SystemClassLoaderAction(scl));</div><div class="line">            &#125; catch (PrivilegedActionException pae) &#123;</div><div class="line">                oops = pae.getCause();</div><div class="line">                if (oops instanceof InvocationTargetException) &#123;</div><div class="line">                    oops = oops.getCause();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            if (oops != null) &#123;</div><div class="line">                if (oops instanceof Error) &#123;</div><div class="line">                    throw (Error) oops;</div><div class="line">                &#125; else &#123;</div><div class="line">                    // wrap the exception</div><div class="line">                    throw new Error(oops);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        sclSet = true;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">/**</div><div class="line">     * The class loader used for loading from java.class.path.</div><div class="line">     * runs in a restricted security context.</div><div class="line">     */</div><div class="line">    static class AppClassLoader extends URLClassLoader &#123;</div><div class="line"></div><div class="line"></div><div class="line">        public static ClassLoader getAppClassLoader(final ClassLoader extcl)</div><div class="line">            throws IOException</div><div class="line">        &#123;</div><div class="line">            final String s = System.getProperty(&quot;java.class.path&quot;);</div><div class="line">            final File[] path = (s == null) ? new File[0] : getClassPath(s);</div><div class="line"></div><div class="line"></div><div class="line">            return AccessController.doPrivileged(</div><div class="line">                new PrivilegedAction&lt;AppClassLoader&gt;() &#123;</div><div class="line">                    public AppClassLoader run() &#123;</div><div class="line">                    URL[] urls =</div><div class="line">                        (s == null) ? new URL[0] : pathToURLs(path);</div><div class="line">                    return new AppClassLoader(urls, extcl);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        ......</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    </div><div class="line">    /*</div><div class="line">     * The class loader used for loading installed extensions.</div><div class="line">     */</div><div class="line">    static class ExtClassLoader extends URLClassLoader &#123;</div><div class="line"></div><div class="line">        static &#123;</div><div class="line">            ClassLoader.registerAsParallelCapable();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        /**</div><div class="line">         * create an ExtClassLoader. The ExtClassLoader is created</div><div class="line">         * within a context that limits which files it can read</div><div class="line">         */</div><div class="line">        public static ExtClassLoader getExtClassLoader() throws IOException</div><div class="line">        &#123;</div><div class="line">            final File[] dirs = getExtDirs();</div><div class="line"></div><div class="line">            try &#123;</div><div class="line">                // Prior implementations of this doPrivileged() block supplied</div><div class="line">                // aa synthesized ACC via a call to the private method</div><div class="line">                // ExtClassLoader.getContext().</div><div class="line"></div><div class="line">                return AccessController.doPrivileged(</div><div class="line">                    new PrivilegedExceptionAction&lt;ExtClassLoader&gt;() &#123;</div><div class="line">                        public ExtClassLoader run() throws IOException &#123;</div><div class="line">                            int len = dirs.length;</div><div class="line">                            for (int i = 0; i &lt; len; i++) &#123;</div><div class="line">                                MetaIndex.registerDirectory(dirs[i]);</div><div class="line">                            &#125;</div><div class="line">                            return new ExtClassLoader(dirs);</div><div class="line">                        &#125;</div><div class="line">                    &#125;);</div><div class="line">            &#125; catch (java.security.PrivilegedActionException e) &#123;</div><div class="line">                throw (IOException) e.getException();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private static File[] getExtDirs() &#123;</div><div class="line">            String s = System.getProperty(&quot;java.ext.dirs&quot;);</div><div class="line">            File[] dirs;</div><div class="line">            if (s != null) &#123;</div><div class="line">                StringTokenizer st =</div><div class="line">                    new StringTokenizer(s, File.pathSeparator);</div><div class="line">                int count = st.countTokens();</div><div class="line">                dirs = new File[count];</div><div class="line">                for (int i = 0; i &lt; count; i++) &#123;</div><div class="line">                    dirs[i] = new File(st.nextToken());</div><div class="line">                &#125;</div><div class="line">            &#125; else &#123;</div><div class="line">                dirs = new File[0];</div><div class="line">            &#125;</div><div class="line">            return dirs;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">......</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>由此可见：</p>
+<ol>
+<li>每一个ClassLoader都有一个父加载器</li>
+<li>父加载器不是父类</li>
+</ol>
+<p>根据上面Launcher的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">extcl = ExtClassLoader.getExtClassLoader();</div><div class="line"></div><div class="line">loader = AppClassLoader.getAppClassLoader(extcl);</div></pre></td></tr></table></figure>
+<ol>
+<li>AppClassLoader 的父加载器是ExtClassLoader</li>
+<li>ExtClassLoader 的父加载器为Null(<strong><em>++问题来了，为什么说每一个ClassLoader都有一个父加载器呢？++</em></strong>)</li>
+</ol>
+<p>继续看源码：</p>
+<h5 id="类加载的过程"><a href="#类加载的过程" class="headerlink" title="类加载的过程"></a><strong>类加载的过程</strong></h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</div><div class="line">        throws ClassNotFoundException</div><div class="line">    &#123;</div><div class="line">        synchronized (getClassLoadingLock(name)) &#123;</div><div class="line">            // 首先，检测是否已经加载</div><div class="line">            Class&lt;?&gt; c = findLoadedClass(name);</div><div class="line">            if (c == null) &#123;</div><div class="line">                long t0 = System.nanoTime();</div><div class="line">                try &#123;</div><div class="line">                    if (parent != null) &#123;</div><div class="line">                        //父加载器不为空则调用父加载器的loadClass</div><div class="line">                        c = parent.loadClass(name, false);</div><div class="line">                    &#125; else &#123;</div><div class="line">                        //父加载器为空则调用Bootstrap Classloader</div><div class="line">                        c = findBootstrapClassOrNull(name);</div><div class="line">                    &#125;</div><div class="line">                &#125; catch (ClassNotFoundException e) &#123;</div><div class="line">                    // ClassNotFoundException thrown if class not found</div><div class="line">                    // from the non-null parent class loader</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                if (c == null) &#123;</div><div class="line">                    // If still not found, then invoke findClass in order</div><div class="line">                    // to find the class.</div><div class="line">                    long t1 = System.nanoTime();</div><div class="line">                    //父加载器没有找到，则调用findclass</div><div class="line">                    c = findClass(name);</div><div class="line"></div><div class="line">                    // this is the defining class loader; record the stats</div><div class="line">                    sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</div><div class="line">                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</div><div class="line">                    sun.misc.PerfCounter.getFindClasses().increment();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            if (resolve) &#123;</div><div class="line">                //调用resolveClass()</div><div class="line">                resolveClass(c);</div><div class="line">            &#125;</div><div class="line">            return c;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>可以得出：</p>
+<ol>
+<li>现在当前的缓存中获取class</li>
+<li>获取不到class，调用父加载器的loadclass</li>
+<li>如果父加载器也没有获取到class，在自己的路径中查询class</li>
+<li>如果父加载器为空，调用 findBootstrapClassOrNull ，可以理解为用BootstrapClassLoader为父加载器，这就解释是为什么所以所有的classloader都有父加载器，为什么不直接进去，因为BootstrapClassLoader为C++实现，不是java类</li>
+</ol>
+<p>上面的加载过程可以解释为：<strong>++双亲委托模式++</strong></p>
+<ol>
+<li>委托是从下向上</li>
+<li>查找是从上向下</li>
+</ol>
+<p>一般来说，核心的类都会提前加载到内存中，这样在用户app运行的时候，如果定义了一个路径和名称相同的类，按照这个模式，还是会返回核心区的类，保证了安全性</p>
+<p>JAVA中自定义ClassLoader：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">import java.io.ByteArrayOutputStream;</div><div class="line">import java.io.File;</div><div class="line">import java.io.FileInputStream;</div><div class="line">import java.io.FileNotFoundException;</div><div class="line">import java.io.IOException;</div><div class="line"></div><div class="line">public class DiskClassLoader extends ClassLoader &#123;</div><div class="line"></div><div class="line">    private String mLibPath;</div><div class="line"></div><div class="line">    public DiskClassLoader(String path) &#123;</div><div class="line">        // TODO Auto-generated constructor stub</div><div class="line">        mLibPath = path;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;</div><div class="line">        // TODO Auto-generated method stub</div><div class="line">        String fileName = getFileName(name);</div><div class="line">        File file = new File(mLibPath,fileName);</div><div class="line">        try &#123;</div><div class="line">            FileInputStream is = new FileInputStream(file);</div><div class="line">            ByteArrayOutputStream bos = new ByteArrayOutputStream();</div><div class="line">            int len = 0;</div><div class="line">            try &#123;</div><div class="line">                while ((len = is.read()) != -1) &#123;</div><div class="line">                    bos.write(len);</div><div class="line">                &#125;</div><div class="line">            &#125; catch (IOException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            byte[] data = bos.toByteArray();</div><div class="line">            is.close();</div><div class="line">            bos.close();</div><div class="line"></div><div class="line">            return defineClass(name,data,0,data.length);</div><div class="line"></div><div class="line">        &#125; catch (IOException e) &#123;</div><div class="line">            // TODO Auto-generated catch block</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return super.findClass(name);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //获取要加载 的class文件名</div><div class="line">    private String getFileName(String name) &#123;</div><div class="line">        // TODO Auto-generated method stub</div><div class="line">        int index = name.lastIndexOf(&apos;.&apos;);</div><div class="line">        if(index == -1)&#123; </div><div class="line">            return name+&quot;.class&quot;;</div><div class="line">        &#125;else&#123;</div><div class="line">            return name.substring(index+1)+&quot;.class&quot;;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>重写findclass，读取class文件，转化为二进制数据，调用defineClass。注意这里并没有设置parent classloader 。只是单纯为了演示，正常使用需要设置一下parent classloader 为AppClassLoader</p>
+<p><strong>contextClassLoader</strong> 跟线程绑定的classloader[可以为线程设置特殊的classloader，完成特殊的任务]<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">public class Thread implements Runnable &#123;</div><div class="line"></div><div class="line">/* The context ClassLoader for this thread */</div><div class="line">   private ClassLoader contextClassLoader;</div><div class="line"></div><div class="line">   public void setContextClassLoader(ClassLoader cl) &#123;</div><div class="line">       SecurityManager sm = System.getSecurityManager();</div><div class="line">       if (sm != null) &#123;</div><div class="line">           sm.checkPermission(new RuntimePermission(&quot;setContextClassLoader&quot;));</div><div class="line">       &#125;</div><div class="line">       contextClassLoader = cl;</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   public ClassLoader getContextClassLoader() &#123;</div><div class="line">       if (contextClassLoader == null)</div><div class="line">           return null;</div><div class="line">       SecurityManager sm = System.getSecurityManager();</div><div class="line">       if (sm != null) &#123;</div><div class="line">           ClassLoader.checkClassLoaderPermission(contextClassLoader,</div><div class="line">                                                  Reflection.getCallerClass());</div><div class="line">       &#125;</div><div class="line">       return contextClassLoader;</div><div class="line">   &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>Java的ClassLoader 完毕！</strong></p>
+<h3 id="Android-ClassLoader"><a href="#Android-ClassLoader" class="headerlink" title="Android ClassLoader"></a>Android ClassLoader</h3><p>源码位置:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">libcore\ojluni\src\main\java\java\lang\ClassLoader.java</div></pre></td></tr></table></figure>
+<p>按照惯例先看源码注释：</p>
+<p>注释有很多，这里忽略了大部分</p>
+<blockquote>
+<p>A class loader is an object that is responsible for loading classes (ClassLoader的职责是加载类)</p>
+<p>The ClassLoader class uses a delegation model to search for<br> classes and resources.  Each instance of ClassLoader has an<br> associated parent class loader.  When requested to find a class or resource, a ClassLoader instance will delegate the search for the class or resource to its parent class loader before attempting to find the class or resource itself.  The virtual machine’s built-in class loader,called the “bootstrap class loader”, does not itself have a parent but may serve as the parent of a ClassLoader instance.<br> 类加载器使用代理模型记载类和资源。每一个类加载器都有一个相关联的父加载器。当需要查找一个类的时候，当自己的缓存中查找不到类时，该类加载器会把此动作代理给父加载器，父加载也找不到时，才会自己去查找加载。虚拟器内置的类加载器是：Bootstrap Class Loader ,这个类加载器没有父加载器，通常是作为别的ClassLoader的父加载器</p>
+<p> However, some classes may not originate from a file; they may originate from other sources, such as the network, or they could be constructed by an application.  The method defineClass(String, byte[], int, int)  converts an array of bytes into an instance of class. Instances of this newly defined class can be created using  Class.newInstance<br> 然而，有的类可能并不是保存在本地的文件，它们可能来源于其它的地方，类似于网络等。defineClass 这个方法的作用是，把一个字节数组转为一个Class实例.再通过Class.newInstance 产生对象实例</p>
+</blockquote>
+<p> 一个简单的自定义ClassLoader<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">class NetworkClassLoader extends ClassLoader &#123;</div><div class="line">          String host;</div><div class="line">          int port;</div><div class="line"> </div><div class="line">          public Class findClass(String name) &#123;</div><div class="line">              byte[] b = loadClassData(name);</div><div class="line">              return defineClass(name, b, 0, b.length);</div><div class="line">          &#125;</div><div class="line"> </div><div class="line">          private byte[] loadClassData(String name) &#123;</div><div class="line">              // load the class data from the connection</div><div class="line">              &amp;nbsp;.&amp;nbsp;.&amp;nbsp;.</div><div class="line">          &#125;</div><div class="line">         &#125;</div></pre></td></tr></table></figure></p>
+<p>Android中ClassLoader源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"> static private class SystemClassLoader &#123;</div><div class="line">        public static ClassLoader loader = ClassLoader.createSystemClassLoader();</div><div class="line">    &#125;</div><div class="line">    </div><div class="line"> private static ClassLoader createSystemClassLoader() &#123;</div><div class="line">        String classPath = System.getProperty(&quot;java.class.path&quot;, &quot;.&quot;);</div><div class="line">        String librarySearchPath = System.getProperty(&quot;java.library.path&quot;, &quot;&quot;);</div><div class="line"></div><div class="line">        // String[] paths = classPath.split(&quot;:&quot;);</div><div class="line">        // URL[] urls = new URL[paths.length];</div><div class="line">        // for (int i = 0; i &lt; paths.length; i++) &#123;</div><div class="line">        // try &#123;</div><div class="line">        // urls[i] = new URL(&quot;file://&quot; + paths[i]);</div><div class="line">        // &#125;</div><div class="line">        // catch (Exception ex) &#123;</div><div class="line">        // ex.printStackTrace();</div><div class="line">        // &#125;</div><div class="line">        // &#125;</div><div class="line">        //</div><div class="line">        // return new java.net.URLClassLoader(urls, null);</div><div class="line"></div><div class="line">        // TODO Make this a java.net.URLClassLoader once we have those?</div><div class="line">        return new PathClassLoader(classPath, librarySearchPath, BootClassLoader.getInstance());</div><div class="line">    &#125;</div><div class="line">    </div><div class="line"> protected ClassLoader(ClassLoader parent) &#123;</div><div class="line">        this(checkCreateClassLoader(), parent);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">protected ClassLoader() &#123;</div><div class="line">        this(checkCreateClassLoader(), getSystemClassLoader());</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    </div><div class="line">//Android 中废弃了defineClass</div><div class="line">  protected final Class&lt;?&gt; defineClass(String name, java.nio.ByteBuffer b,</div><div class="line">                                         ProtectionDomain protectionDomain)</div><div class="line">        throws ClassFormatError</div><div class="line">    &#123;</div><div class="line">        throw new UnsupportedOperationException(&quot;can&apos;t load this type of class file&quot;);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>由此可见：</p>
+<ol>
+<li>ClassLoader默认的父类加载器是PathClassLoader</li>
+<li>初始化PathClassLoader的时候，对于加载类为java的核心类<ul>
+<li>System.getProperty(“java.class.path”, “.”);</li>
+<li>System.getProperty(“java.library.path”, “”);</li>
+</ul>
+</li>
+<li>PathClassLoader 的父类加载是 BootClassLoader</li>
+<li>Android中如果调用defineClass直接抛出异常，说明google抛弃的原来加载类的方式</li>
+</ol>
+<p>类图如下：</p>
+<p><img src="https://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/class_loader.png" alt="image"></p>
+<ol>
+<li>ClassLoader<br>所有classLoader的基类，源于Java源码，但是google改写了大部分的方法</li>
+<li>BootClassLoader<br>PathClassLoader的父加载器 </li>
+<li>BaseDexClassLoader<br>继承于ClassLoader ,是DexClassLoader 和 PathClassLoader的父类 </li>
+<li>DexClassLoader  、PathClassLoader 常用的类加载器，它们的实现几乎一样，PathClassLoader是加载系统的类，DexClassLoader加载定义的类，区别就是传递给BaseDexClassLoader的路径不同，其它都一样</li>
+<li>DexPathList  真正实现类查找的逻辑所在</li>
+</ol>
+<p>最终ClassLoader中调用的大部分都是native方法，我们这里主要分析，Android是如何加载Apk，查找类的：</p>
+<p>它们的关系：</p>
+<p>DexClassLoader-&gt;PathClassLoader-&gt;BootClassLoader</p>
+<p>我们直接来分析关键代码：<br>PathClassLoader optimizedDirectory 为null,只能加载安装后的apk,也就是dex文件<br>DexClassLoader 可以加载未安装的dex文件</p>
+<p>BaseDexClassLoader:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">public BaseDexClassLoader(String dexPath, File optimizedDirectory,</div><div class="line">          String librarySearchPath, ClassLoader parent) &#123;</div><div class="line">      super(parent);</div><div class="line">      this.pathList = new DexPathList(this, dexPath, librarySearchPath, null);</div><div class="line"></div><div class="line">      if (reporter != null) &#123;</div><div class="line">          reporter.report(this.pathList.getDexPaths());</div><div class="line">      &#125;</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  </div><div class="line">  public DexPathList(ClassLoader definingContext, String dexPath,</div><div class="line">          String librarySearchPath, File optimizedDirectory) &#123;</div><div class="line"></div><div class="line">      if (definingContext == null) &#123;</div><div class="line">          throw new NullPointerException(&quot;definingContext == null&quot;);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      if (dexPath == null) &#123;</div><div class="line">          throw new NullPointerException(&quot;dexPath == null&quot;);</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      if (optimizedDirectory != null) &#123;</div><div class="line">          if (!optimizedDirectory.exists())  &#123;</div><div class="line">              throw new IllegalArgumentException(</div><div class="line">                      &quot;optimizedDirectory doesn&apos;t exist: &quot;</div><div class="line">                      + optimizedDirectory);</div><div class="line">          &#125;</div><div class="line"></div><div class="line">          if (!(optimizedDirectory.canRead()</div><div class="line">                          &amp;&amp; optimizedDirectory.canWrite())) &#123;</div><div class="line">              throw new IllegalArgumentException(</div><div class="line">                      &quot;optimizedDirectory not readable/writable: &quot;</div><div class="line">                      + optimizedDirectory);</div><div class="line">          &#125;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      this.definingContext = definingContext;</div><div class="line"></div><div class="line">      ArrayList&lt;IOException&gt; suppressedExceptions = new ArrayList&lt;IOException&gt;();</div><div class="line">      // save dexPath for BaseDexClassLoader</div><div class="line">      this.dexElements = makeDexElements(splitDexPath(dexPath), optimizedDirectory,</div><div class="line">                                         suppressedExceptions, definingContext);</div><div class="line"></div><div class="line">      // Native libraries may exist in both the system and</div><div class="line">      // application library paths, and we use this search order:</div><div class="line">      //</div><div class="line">      //   1. This class loader&apos;s library path for application libraries (librarySearchPath):</div><div class="line">      //   1.1. Native library directories</div><div class="line">      //   1.2. Path to libraries in apk-files</div><div class="line">      //   2. The VM&apos;s library path from the system property for system libraries</div><div class="line">      //      also known as java.library.path</div><div class="line">      //</div><div class="line">      // This order was reversed prior to Gingerbread; see http://b/2933456.</div><div class="line">      this.nativeLibraryDirectories = splitPaths(librarySearchPath, false);</div><div class="line">      this.systemNativeLibraryDirectories =</div><div class="line">              splitPaths(System.getProperty(&quot;java.library.path&quot;), true);</div><div class="line">      List&lt;File&gt; allNativeLibraryDirectories = new ArrayList&lt;&gt;(nativeLibraryDirectories);</div><div class="line">      allNativeLibraryDirectories.addAll(systemNativeLibraryDirectories);</div><div class="line"></div><div class="line">      this.nativeLibraryPathElements = makePathElements(allNativeLibraryDirectories);</div><div class="line"></div><div class="line">      if (suppressedExceptions.size() &gt; 0) &#123;</div><div class="line">          this.dexElementsSuppressedExceptions =</div><div class="line">              suppressedExceptions.toArray(new IOException[suppressedExceptions.size()]);</div><div class="line">      &#125; else &#123;</div><div class="line">          dexElementsSuppressedExceptions = null;</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>可以看到，在构造方法中初始化了DexPathList,后续的class的查找几乎都是通过这个类完成的!</p>
+<p><strong>VMClassLoader</strong>：<br>实现基本上都是在native，缓存loader对于的class文件，Google如此实现，是专门优化了类的查找和保存</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">  //来源于其父类，ClassLoader</div><div class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</div><div class="line">        throws ClassNotFoundException</div><div class="line">    &#123;</div><div class="line">            // First, check if the class has already been loaded</div><div class="line">            //现在缓存中查找是否已经加载过</div><div class="line">            Class&lt;?&gt; c = findLoadedClass(name);</div><div class="line">            if (c == null) &#123;</div><div class="line">                try &#123;</div><div class="line">                    if (parent != null) &#123;</div><div class="line">                        // 让父加载器去加载</div><div class="line">                        c = parent.loadClass(name, false);</div><div class="line">                    &#125; else &#123;</div><div class="line">                        //这个是直接返回null，BootClassLoader的父加载器为null，此时就是真的找不到了</div><div class="line">                        c = findBootstrapClassOrNull(name);</div><div class="line">                    &#125;</div><div class="line">                &#125; catch (ClassNotFoundException e) &#123;</div><div class="line">                    // ClassNotFoundException thrown if class not found</div><div class="line">                    // from the non-null parent class loader</div><div class="line">                &#125;</div><div class="line">                </div><div class="line">                //最终还是自己找</div><div class="line">                if (c == null) &#123;</div><div class="line">                    // If still not found, then invoke findClass in order</div><div class="line">                    // to find the class.</div><div class="line">                    c = findClass(name);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            return c;</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">  //来源于BootClassLoader</div><div class="line">  @Override</div><div class="line">    protected Class&lt;?&gt; loadClass(String className, boolean resolve)</div><div class="line">           throws ClassNotFoundException &#123;</div><div class="line">        //通过VMClassLoader 查找缓存的class，这是因为该加载器没有父加载器，索性把逻辑直接改了</div><div class="line">        Class&lt;?&gt; clazz = findLoadedClass(className);</div><div class="line"></div><div class="line">        if (clazz == null) &#123;</div><div class="line">            //找不到再调用自己的查找</div><div class="line">            clazz = findClass(className);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        return clazz;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">   //来源于BaseDexClassLoader ，真正ClassLoader本身查找类的方式就是通过这个来实现的</div><div class="line">   @Override</div><div class="line">    protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;</div><div class="line">        List&lt;Throwable&gt; suppressedExceptions = new ArrayList&lt;Throwable&gt;();</div><div class="line">        //查找类的入口</div><div class="line">        Class c = pathList.findClass(name, suppressedExceptions);</div><div class="line">        if (c == null) &#123;</div><div class="line">            ClassNotFoundException cnfe = new ClassNotFoundException(</div><div class="line">                    &quot;Didn&apos;t find class \&quot;&quot; + name + &quot;\&quot; on path: &quot; + pathList);</div><div class="line">            for (Throwable t : suppressedExceptions) &#123;</div><div class="line">                cnfe.addSuppressed(t);</div><div class="line">            &#125;</div><div class="line">            throw cnfe;</div><div class="line">        &#125;</div><div class="line">        return c;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>上面大概了解了ClassLoader的查找过程，真正的算法实现还是在DexPathList中的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">//DexPathList中查找类的方法</div><div class="line"> public Class&lt;?&gt; findClass(String name, List&lt;Throwable&gt; suppressed) &#123;</div><div class="line"> </div><div class="line">     //遍历所有的dex文件，查找类</div><div class="line">     for (Element element : dexElements) &#123;</div><div class="line">         Class&lt;?&gt; clazz = element.findClass(name, definingContext, suppressed);</div><div class="line">         if (clazz != null) &#123;</div><div class="line">             return clazz;</div><div class="line">         &#125;</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     if (dexElementsSuppressedExceptions != null) &#123;</div><div class="line">         suppressed.addAll(Arrays.asList(dexElementsSuppressedExceptions));</div><div class="line">     &#125;</div><div class="line">     return null;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> //Element中调用关系</div><div class="line">  public Class&lt;?&gt; findClass(String name, ClassLoader definingContext,</div><div class="line">             List&lt;Throwable&gt; suppressed) &#123;</div><div class="line">         return dexFile != null ? dexFile.loadClassBinaryName(name, definingContext, suppressed)</div><div class="line">                 : null;</div><div class="line">     &#125;</div><div class="line">     </div><div class="line"> //DexFile 代码</div><div class="line"> //最终调用到DexFile的loadClassBinaryName</div><div class="line">  public Class loadClassBinaryName(String name, ClassLoader loader, List&lt;Throwable&gt; suppressed) &#123;</div><div class="line">     return defineClass(name, loader, mCookie, this, suppressed);</div><div class="line"> &#125;</div><div class="line"> </div><div class="line">   //调用到Native中的查找方法</div><div class="line">   private static Class defineClass(String name, ClassLoader loader, Object cookie,</div><div class="line">                                  DexFile dexFile, List&lt;Throwable&gt; suppressed) &#123;</div><div class="line">     Class result = null;</div><div class="line">     try &#123;</div><div class="line">         result = defineClassNative(name, loader, cookie, dexFile);</div><div class="line">     &#125; catch (NoClassDefFoundError e) &#123;</div><div class="line">         if (suppressed != null) &#123;</div><div class="line">             suppressed.add(e);</div><div class="line">         &#125;</div><div class="line">     &#125; catch (ClassNotFoundException e) &#123;</div><div class="line">         if (suppressed != null) &#123;</div><div class="line">             suppressed.add(e);</div><div class="line">         &#125;</div><div class="line">     &#125;</div><div class="line">     return result;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>Native的源码没找到，找到继续分析！</p>
+<p>总结：<br>现在可以理解Java的层热修复，主要是在findClass中动了手脚，Tinker是在Element中数组的最前面插入了一个Element，这样就会提前搜索到插入的类代码!</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/29/Android ClassLoader/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Handler详解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -948,6 +1132,116 @@ var _hmt = _hmt || [];
 
 
   
+    <article id="post-Activity四种启动模式以及taskAffinity的使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="四种启动模式"><a href="#四种启动模式" class="headerlink" title="四种启动模式"></a>四种启动模式</h2><ol>
+<li>standard 标准模式（默认的模式）<blockquote>
+<p>每次启动都会在当前的任务栈中生成一个新的Activity实例</p>
+</blockquote>
+</li>
+<li>singleTop 栈顶单一模式<blockquote>
+<p>如果此Activity已经存在于栈顶，则直接走onNewIntent，onResume ,不会再创建实例（不会走onCreate onStart）;如果此Activity不存于栈顶，栈的中间位置，则类似于standard新生成一个实例</p>
+</blockquote>
+</li>
+<li>singleTask 栈中唯一模式<blockquote>
+<p>如果此Activity已经存在于栈中，则把该Activity之上所有其他的Activity全部弹出栈（销毁，会走onDestroy方法），调用此Acitivity的onNewIntent、onReume、onStart</p>
+</blockquote>
+</li>
+<li>singleInstance 全局唯一模式<blockquote>
+<p>独享一个栈空间，全部如果存在此Activity 则走onNewIntent 和 onResume ,因为此模式是独享新栈，在此Activity上面再启动其他的activity的时候，会回到之前的栈，如果此时再back，会在前一个栈走完后，才会回到新的此Activity的栈</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h2><p>当开始一个没有Intent.FLAG_ACTIVITY_NEW_TASK标志的Activity时，任务共用性affinities不会影响将会运行该新活动的Task:它总是运行在启动它的Task里。但是，如果使用了NEW_TASK标志，那么共用性（affinity）将被用来判断是否已经存在一个有相同共用性（affinity）的Task。如果是这样，这项Task将被切换到前面而新的Activity会启动于这个Task的顶层。</p>
+<p>跟 Task 有关的 manifest文件中Activity的特性值介绍<br>android:allowTaskReparenting<br>    用来标记Activity能否从启动的Task移动到有着affinity的Task（当这个Task进入到前台时）</p>
+<p>   “true”，表示能移动，“false”，表示它必须呆在启动时呆在的那个Task里。</p>
+<p>如果这个特性没有被设定，设定到<application>元素上的allowTaskReparenting特性的值会应用到Activity上。默认值为“false”。</application></p>
+<p>一般来说，当Activity启动后，它就与启动它的Task关联，并且在那里耗尽它的整个生命周期。当当前的Task不再显示时，你可以使用这个特性来强制Activity移动到有着affinity的Task中。典型用法是：把一个应用程序的Activity移到另一个应用程序的主Task中。 </p>
+<h2 id="gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。"><a href="#gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。" class="headerlink" title="&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。"></a>&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。</h2><blockquote>
+<p>Actvity的affinity是由taskAffinity特性定义的。Task的affinity是通过读取根Activity的affinity决定。因此，根Activity总是位于相同affinity的Task里。由于启动模式为“singleTask”和“singleInstance”的Activity只能位于Task的底部，因此，重新宿主只能限于“standard”和“singleTop”模式。</p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Android屏幕适配" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1087,249 +1381,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2018/03/12/Android屏幕适配/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Activity四种启动模式以及taskAffinity的使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
-    </h1>
-  
-
-        
-        <a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="四种启动模式"><a href="#四种启动模式" class="headerlink" title="四种启动模式"></a>四种启动模式</h2><ol>
-<li>standard 标准模式（默认的模式）<blockquote>
-<p>每次启动都会在当前的任务栈中生成一个新的Activity实例</p>
-</blockquote>
-</li>
-<li>singleTop 栈顶单一模式<blockquote>
-<p>如果此Activity已经存在于栈顶，则直接走onNewIntent，onResume ,不会再创建实例（不会走onCreate onStart）;如果此Activity不存于栈顶，栈的中间位置，则类似于standard新生成一个实例</p>
-</blockquote>
-</li>
-<li>singleTask 栈中唯一模式<blockquote>
-<p>如果此Activity已经存在于栈中，则把该Activity之上所有其他的Activity全部弹出栈（销毁，会走onDestroy方法），调用此Acitivity的onNewIntent、onReume、onStart</p>
-</blockquote>
-</li>
-<li>singleInstance 全局唯一模式<blockquote>
-<p>独享一个栈空间，全部如果存在此Activity 则走onNewIntent 和 onResume ,因为此模式是独享新栈，在此Activity上面再启动其他的activity的时候，会回到之前的栈，如果此时再back，会在前一个栈走完后，才会回到新的此Activity的栈</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h2><p>当开始一个没有Intent.FLAG_ACTIVITY_NEW_TASK标志的Activity时，任务共用性affinities不会影响将会运行该新活动的Task:它总是运行在启动它的Task里。但是，如果使用了NEW_TASK标志，那么共用性（affinity）将被用来判断是否已经存在一个有相同共用性（affinity）的Task。如果是这样，这项Task将被切换到前面而新的Activity会启动于这个Task的顶层。</p>
-<p>跟 Task 有关的 manifest文件中Activity的特性值介绍<br>android:allowTaskReparenting<br>    用来标记Activity能否从启动的Task移动到有着affinity的Task（当这个Task进入到前台时）</p>
-<p>   “true”，表示能移动，“false”，表示它必须呆在启动时呆在的那个Task里。</p>
-<p>如果这个特性没有被设定，设定到<application>元素上的allowTaskReparenting特性的值会应用到Activity上。默认值为“false”。</application></p>
-<p>一般来说，当Activity启动后，它就与启动它的Task关联，并且在那里耗尽它的整个生命周期。当当前的Task不再显示时，你可以使用这个特性来强制Activity移动到有着affinity的Task中。典型用法是：把一个应用程序的Activity移到另一个应用程序的主Task中。 </p>
-<h2 id="gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。"><a href="#gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。" class="headerlink" title="&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。"></a>&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。</h2><blockquote>
-<p>Actvity的affinity是由taskAffinity特性定义的。Task的affinity是通过读取根Activity的affinity决定。因此，根Activity总是位于相同affinity的Task里。由于启动模式为“singleTask”和“singleInstance”的Activity只能位于Task的底部，因此，重新宿主只能限于“standard”和“singleTop”模式。</p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-2017-8-30-andrew-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/30/2017-8-30-andrew-1/">神经网络(1)</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/30/2017-8-30-andrew-1/" class="archive-article-date">
-  	<time datetime="2017-08-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="神经网络概述"><a href="#神经网络概述" class="headerlink" title="神经网络概述"></a>神经网络概述</h2><ol>
-<li>翻译 ：Neural Network  神经网络</li>
-<li>最简单的神经网络：</li>
-</ol>
-<p><strong>根据房屋的大小预测价格</strong>：<br> <img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_1.png" alt="image"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">x -&gt; 房屋面积</div><div class="line">y -&gt; 房屋价格</div><div class="line">ReLu -&gt; 修正线性单元</div><div class="line">input(X) ---&gt; neuron（ReLu） ---&gt; output(y)</div><div class="line"></div><div class="line">X到Y是一个计算，需要一个线性函数计算，</div><div class="line">这个线性函数就是 ReLu ,</div><div class="line">Re代表修正，约定了x和y不可能小于0，算是输入输出的条件约束</div><div class="line"></div><div class="line">Neuron 神经元</div></pre></td></tr></table></figure>
-<p>已上就是一个简单的神经网络，只有一个神经元</p>
-<ol>
-<li>复杂的神经网络</li>
-</ol>
-<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/neural_network_2.png" alt="image"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">// 复杂的神经网络</div><div class="line"></div><div class="line">x1,x2,x3,x4 属于 input值，通过不同的ReLU单元运算，输出另外一个值，</div><div class="line">通过第二层的ReLU 得出结果</div><div class="line"></div><div class="line">相当于多个神经元叠加在一起</div></pre></td></tr></table></figure></p>
-<ol>
-<li><p>Supervised Learning 监督学习</p>
-<ul>
-<li>有明确的Input和Output的学习</li>
-<li>机器学习获得到的主要成果</li>
-</ul>
-</li>
-<li><p>Type of Neural Networks</p>
-<ol>
-<li>Convolutional Neural NetWork 卷积神经网络<br>处理Image </li>
-<li>Standard Neural NetWork   标准神经网络<br>上面提到的价格预测就属于 SNN 解决的问题 </li>
-<li>Recurrent Neural NetWork  循环神经网络<br> 主要处理一维数据，Sequence Data(Audio-&gt;Text,Engish-&gt;Chinese)</li>
-</ol>
-</li>
-<li><p>Data Category</p>
-<ol>
-<li>Structured Data : database,every data cell has confirmed meaning </li>
-<li>Unstructured Data : image,text,audio,video …</li>
-</ol>
-</li>
-<li><p>现阶段神经网络的应用</p>
-<ol>
-<li>语音识别 RNN</li>
-<li>图片识别 CNN</li>
-<li>结果预测 SNN</li>
-<li>自动驾驶 RNN + CNN + SNN 自动驾驶是一个复杂的系统，需要结合多种神经网络</li>
-<li>广告推荐 SNN</li>
-</ol>
-</li>
-</ol>
-<ol>
-<li>为什么神经网络和机器学习会突然兴起 <ol>
-<li>Data ：data become cheap and large</li>
-<li>Computation： resouce become stronger</li>
-<li>Algorithms： new algorithms</li>
-</ol>
-</li>
-</ol>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/深度学习/" class="article-tag-list-link color5">深度学习</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/30/2017-8-30-andrew-1/">展开全文 >></a>
         </p>
       
 
