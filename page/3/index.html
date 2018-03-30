@@ -6,22 +6,18 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Binder-3 (ServiceManager) | NEVERMORE</title>
+  <title>NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="ServiceManager1. 概述ServiceManager是Binder IPC通信过程中的守护进程，本身也是一个Binder服务，但并没有采用libbinder中的多线程模型来与Binder驱动通信，而是自行编写了binder.c直接和Binder驱动来通信，并且只有一个循环binder_loop来进行读取和处理事务，这样的好处是简单而高效。 ServiceManager本身工作相对简单">
-<meta name="keywords" content="技术">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Binder-3 (ServiceManager)">
-<meta property="og:url" content="http://yoursite.com/2018/03/20/Android Binder机制-3(ServiceManager)/index.html">
+  <meta name="description" content="周庆龙个人技术博客">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NEVERMORE">
+<meta property="og:url" content="http://yoursite.com/page/3/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="ServiceManager1. 概述ServiceManager是Binder IPC通信过程中的守护进程，本身也是一个Binder服务，但并没有采用libbinder中的多线程模型来与Binder驱动通信，而是自行编写了binder.c直接和Binder驱动来通信，并且只有一个循环binder_loop来进行读取和处理事务，这样的好处是简单而高效。 ServiceManager本身工作相对简单">
+<meta property="og:description" content="周庆龙个人技术博客">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://gityuan.com/images/binder/create_servicemanager/create_servicemanager.jpg">
-<meta property="og:updated_time" content="2018-03-30T07:48:58.738Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Binder-3 (ServiceManager)">
-<meta name="twitter:description" content="ServiceManager1. 概述ServiceManager是Binder IPC通信过程中的守护进程，本身也是一个Binder服务，但并没有采用libbinder中的多线程模型来与Binder驱动通信，而是自行编写了binder.c直接和Binder驱动来通信，并且只有一个循环binder_loop来进行读取和处理事务，这样的好处是简单而高效。 ServiceManager本身工作相对简单">
-<meta name="twitter:image" content="http://gityuan.com/images/binder/create_servicemanager/create_servicemanager.jpg">
+<meta name="twitter:title" content="NEVERMORE">
+<meta name="twitter:description" content="周庆龙个人技术博客">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -159,58 +155,69 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-Android Binder机制-3(ServiceManager)" class="article article-type-post " itemscope itemprop="blogPost">
+            
+  
+    <article id="post-about-study" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 class="article-title" itemprop="name">
-      Binder-3 (ServiceManager)
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/09/about-study/">关于学习</a>
     </h1>
   
 
         
-        <a href="/2018/03/20/Android Binder机制-3(ServiceManager)/" class="archive-article-date">
-  	<time datetime="2018-03-19T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-20</time>
+        <a href="/2017/08/09/about-study/" class="archive-article-date">
+  	<time datetime="2017-08-09T07:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-09</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="ServiceManager"><a href="#ServiceManager" class="headerlink" title="ServiceManager"></a>ServiceManager</h2><h3 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h3><p>ServiceManager是Binder IPC通信过程中的守护进程，本身也是一个Binder服务，但并没有采用libbinder中的多线程模型来与Binder驱动通信，而是自行编写了binder.c直接和Binder驱动来通信，并且只有一个循环binder_loop来进行读取和处理事务，这样的好处是简单而高效。</p>
-<p>ServiceManager本身工作相对简单，其功能：查询和注册服务。 对于Binder IPC通信过程中，其实更多的情形是BpBinder和BBinder之间的通信，比如ActivityManagerProxy和ActivityManagerService之间的通信等。</p>
-<h3 id="2-工作流程"><a href="#2-工作流程" class="headerlink" title="2.工作流程"></a>2.工作流程</h3><p><img src="http://gityuan.com/images/binder/create_servicemanager/create_servicemanager.jpg" alt="image"></p>
-<p>启动过程主要以下几个阶段：</p>
+        <h3 id="学习的真相"><a href="#学习的真相" class="headerlink" title="学习的真相"></a>学习的真相</h3><hr>
+<ol>
+<li><p>概念<br>理解概念,概念就相当于是“规律”</p>
+</li>
+<li><p>拆解概念</p>
+</li>
+<li><p>重复的作用<br>在思维网络里面建立连接</p>
+</li>
+<li><p>有效的学些方法<br>持续的做你不会做的事情</p>
+</li>
+<li><p>心理学分三个区<br> <strong>舒适区-学习区-恐慌区</strong></p>
+<blockquote>
+<p>脱离舒适区-不能一直在舒适区<br>确保所有的行为都是有意识的，非不可控的<br>中国的学生，不断的重复，诱导自己进入舒适区，对新知识没有什么欲望</p>
+</blockquote>
+</li>
+<li><p>好的学习环境 </p>
+<blockquote>
+<p>即时反馈，任何一点小的努力，立即会有效果 </p>
+</blockquote>
+</li>
+<li><p>真正的学习不是软件上建立了记忆，而是硬件已经产生了记忆，每个人大脑的回路是不同的，就是硬件上的不同</p>
+</li>
+</ol>
+<h3 id="为什么学习-和-如何学习"><a href="#为什么学习-和-如何学习" class="headerlink" title="为什么学习 和 如何学习"></a>为什么学习 和 如何学习</h3><hr>
+<blockquote>
+<p>现代人有很大的 学习焦虑，学习已经不再是一件谋生的 必备本领，而是生存的基本技能。一个人的知识体量直接影响生活质量、品质。</p>
+</blockquote>
+<p>学习的方法：</p>
+<ol>
+<li>先掌握 概念</li>
+<li>反复学习</li>
+<li>确定目标-方法-行动【最重要】</li>
+</ol>
+<blockquote>
+<p>学习的方法主要利用碎片化的时间，现在已经不再是那种系统学习知识的时代了，人的时间被打碎，所以系统的学习知识已经变得几乎不可能</p>
+</blockquote>
+<p> 所以之前定的 目标实现难度非常高，是因为我现在几乎没有整片的时间，都是非常碎片，<br> 如何通过碎片的时间来获得整体的系统学习的知识，这个就显得非常重要</p>
 <ul>
-<li>打开binder驱动：binder_open；</li>
-<li>注册成为binder服务的大管家：binder_become_context_manager；</li>
-<li>进入无限循环，处理client端发来的请求：binder_loop；</li>
-</ul>
-<h3 id="3-源码分析"><a href="#3-源码分析" class="headerlink" title="3. 源码分析"></a>3. 源码分析</h3><p>ServiceManager是由init进程通过解析init.rc文件而创建的，其所对应的可执行程序/system/bin/servicemanager，所对应的源文件是service_manager.c，进程名为/system/bin/servicemanager。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">service servicemanager /system/bin/servicemanager</div><div class="line">    class core animation</div><div class="line">    user system</div><div class="line">    group system readproc</div><div class="line">    critical</div><div class="line">    onrestart restart healthd</div><div class="line">    onrestart restart zygote</div><div class="line">    onrestart restart audioserver</div><div class="line">    onrestart restart media</div><div class="line">    onrestart restart surfaceflinger</div><div class="line">    onrestart restart inputflinger</div><div class="line">    onrestart restart drm</div><div class="line">    onrestart restart cameraserver</div><div class="line">    writepid /dev/cpuset/system-background/tasks</div></pre></td></tr></table></figure>
-<p>启动主入口：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line">nt main(int argc, char** argv)</div><div class="line">&#123;</div><div class="line">    struct binder_state *bs;</div><div class="line">    union selinux_callback cb;</div><div class="line">    char *driver;</div><div class="line"></div><div class="line">    if (argc &gt; 1) &#123;</div><div class="line">        driver = argv[1];</div><div class="line">    &#125; else &#123;</div><div class="line">        driver = &quot;/dev/binder&quot;;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //打开设备 ，&quot;/dev/binder&quot;</div><div class="line">    bs = binder_open(driver, 128*1024);</div><div class="line">    if (!bs) &#123;</div><div class="line">#ifdef VENDORSERVICEMANAGER</div><div class="line">        ALOGW(&quot;failed to open binder driver %s\n&quot;, driver);</div><div class="line">        while (true) &#123;</div><div class="line">            sleep(UINT_MAX);</div><div class="line">        &#125;</div><div class="line">#else</div><div class="line">        ALOGE(&quot;failed to open binder driver %s\n&quot;, driver);</div><div class="line">#endif</div><div class="line">        return -1;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //设置servicemanager为binder驱动的守护进程</div><div class="line">    if (binder_become_context_manager(bs)) &#123;</div><div class="line">        ALOGE(&quot;cannot become context manager (%s)\n&quot;, strerror(errno));</div><div class="line">        return -1;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    cb.func_audit = audit_callback;</div><div class="line">    selinux_set_callback(SELINUX_CB_AUDIT, cb);</div><div class="line">    cb.func_log = selinux_log_callback;</div><div class="line">    selinux_set_callback(SELINUX_CB_LOG, cb);</div><div class="line"></div><div class="line">#ifdef VENDORSERVICEMANAGER</div><div class="line">    sehandle = selinux_android_vendor_service_context_handle();</div><div class="line">#else</div><div class="line">    sehandle = selinux_android_service_context_handle();</div><div class="line">#endif</div><div class="line">    selinux_status_open(true);</div><div class="line">        </div><div class="line">    //判断权限</div><div class="line">    if (sehandle == NULL) &#123;</div><div class="line">        ALOGE(&quot;SELinux: Failed to acquire sehandle. Aborting.\n&quot;);</div><div class="line">        abort();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (getcon(&amp;service_manager_context) != 0) &#123;</div><div class="line">        ALOGE(&quot;SELinux: Failed to acquire service_manager context. Aborting.\n&quot;);</div><div class="line">        abort();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //进入无线循环，开始提供服务</div><div class="line">    binder_loop(bs, svcmgr_handler);</div><div class="line"></div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>添加服务：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line">int do_add_service(struct binder_state *bs,</div><div class="line">                   const uint16_t *s, size_t len,</div><div class="line">                   uint32_t handle, uid_t uid, int allow_isolated,</div><div class="line">                   pid_t spid)</div><div class="line">&#123;</div><div class="line">    struct svcinfo *si;</div><div class="line"></div><div class="line">    //ALOGI(&quot;add_service(&apos;%s&apos;,%x,%s) uid=%d\n&quot;, str8(s, len), handle,</div><div class="line">    //        allow_isolated ? &quot;allow_isolated&quot; : &quot;!allow_isolated&quot;, uid);</div><div class="line"></div><div class="line">    if (!handle || (len == 0) || (len &gt; 127))</div><div class="line">        return -1;</div><div class="line">    </div><div class="line">    //校验权限</div><div class="line">    if (!svc_can_register(s, len, spid, uid)) &#123;</div><div class="line">        ALOGE(&quot;add_service(&apos;%s&apos;,%x) uid=%d - PERMISSION DENIED\n&quot;,</div><div class="line">             str8(s, len), handle, uid);</div><div class="line">        return -1;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //查询是否已经注册过</div><div class="line">    si = find_svc(s, len);</div><div class="line">    if (si) &#123;</div><div class="line">        if (si-&gt;handle) &#123;</div><div class="line">            ALOGE(&quot;add_service(&apos;%s&apos;,%x) uid=%d - ALREADY REGISTERED, OVERRIDE\n&quot;,</div><div class="line">                 str8(s, len), handle, uid);</div><div class="line">            //注册过，释放</div><div class="line">            svcinfo_death(bs, si);</div><div class="line">        &#125;</div><div class="line">        si-&gt;handle = handle;</div><div class="line">    &#125; else &#123;</div><div class="line">        //分配空间</div><div class="line">        si = malloc(sizeof(*si) + (len + 1) * sizeof(uint16_t));</div><div class="line">        if (!si) &#123;</div><div class="line">            ALOGE(&quot;add_service(&apos;%s&apos;,%x) uid=%d - OUT OF MEMORY\n&quot;,</div><div class="line">                 str8(s, len), handle, uid);</div><div class="line">            return -1;</div><div class="line">        &#125;</div><div class="line">        // handle-&gt;service端处理逻辑的地方</div><div class="line">        si-&gt;handle = handle;</div><div class="line">        si-&gt;len = len;</div><div class="line">        memcpy(si-&gt;name, s, (len + 1) * sizeof(uint16_t));</div><div class="line">        si-&gt;name[len] = &apos;\0&apos;;</div><div class="line">        si-&gt;death.func = (void*) svcinfo_death;</div><div class="line">        si-&gt;death.ptr = si;</div><div class="line">        si-&gt;allow_isolated = allow_isolated;</div><div class="line">        si-&gt;next = svclist;</div><div class="line">        svclist = si;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    binder_acquire(bs, handle);</div><div class="line">    binder_link_to_death(bs, handle, &amp;si-&gt;death);</div><div class="line">    return 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>查询服务：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">uint32_t do_find_service(const uint16_t *s, size_t len, uid_t uid, pid_t spid)</div><div class="line">&#123;</div><div class="line">    //查询服务</div><div class="line">    struct svcinfo *si = find_svc(s, len);</div><div class="line"></div><div class="line">    if (!si || !si-&gt;handle) &#123;</div><div class="line">        return 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //该服务是否允许单独的进程</div><div class="line">    if (!si-&gt;allow_isolated) &#123;</div><div class="line">        // If this service doesn&apos;t allow access from isolated processes,</div><div class="line">        // then check the uid to see if it is isolated.</div><div class="line">        uid_t appid = uid % AID_USER;</div><div class="line">        if (appid &gt;= AID_ISOLATED_START &amp;&amp; appid &lt;= AID_ISOLATED_END) &#123;</div><div class="line">            return 0;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //校验权限</div><div class="line">    if (!svc_can_find(s, len, spid, uid)) &#123;</div><div class="line">        return 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //返回</div><div class="line">    return si-&gt;handle;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><strong>ServiceManager的获取</strong></p>
-<ul>
-<li>defaultServiceManager 等价于 new BpServiceManager(new BpBinder(0));</li>
-</ul>
-<p><strong>ProcessState::self()主要工作：</strong></p>
-<ul>
-<li>调用open()，打开/dev/binder驱动设备；</li>
-<li>再利用mmap()，创建大小为1M-8K的内存地址空间；</li>
-<li>设定当前进程最大的最大并发Binder线程个数为16。</li>
-</ul>
-<p><strong>BpServiceMaager巧妙将通信层与业务层逻辑合为一体</strong>，</p>
-<ul>
-<li>通过继承接口IServiceManager实现了接口中的业务逻辑函数；</li>
-<li>通过成员变量mRemote= new BpBinder(0)进行Binder通信工作。</li>
-<li>BpBinder通过handler来指向所对应BBinder, 在整个Binder系统中handle=0代表ServiceManager所对应的BBinder。</li>
+<li>目标： 系统学习的目标【已然确定】</li>
+<li>方法： 通过实际的项目-从设计开发-到上线运营</li>
+<li>行动： 按照步骤</li>
 </ul>
 
       
@@ -225,7 +232,7 @@ var _hmt = _hmt || [];
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
         		</li>
       		
 		</ul>
@@ -237,7 +244,7 @@ var _hmt = _hmt || [];
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        			<a href="/categories/得到APP/" class="article-tag-list-link color1">得到APP</a>
         		</li>
       		
 		</ul>
@@ -245,84 +252,16 @@ var _hmt = _hmt || [];
 
 
       
-
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/08/09/about-study/">展开全文 >></a>
+        </p>
       
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
-        </div>
-      </div>
-    </span>
-  </div>
-</div>
 
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2018/03/20/Android Binder机制-3(ServiceManager)/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2018/03/22/Handler详解/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          Handler详解
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2018/03/19/App的启动流程（Android8.0） 第二篇/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">App启动流程（Android 8.0源码）(2)</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -342,23 +281,12 @@ var _hmt = _hmt || [];
 
 
 
-  
-  
-  
-  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
-<script>
-  var cloudTieConfig = {
-    url: "http://yoursite.com/2018/03/20/Android Binder机制-3(ServiceManager)/", 
-    sourceId: "Android Binder机制-3(ServiceManager)",
-    productKey: "true",
-    target: "cloud-tie-wrapper"
-  };
-</script>
-<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
-  
 
   
-
+  
+    <nav id="page-nav">
+      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+    </nav>
   
 
 
@@ -381,8 +309,8 @@ var _hmt = _hmt || [];
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: false,
-		isPost: true,
+		isHome: true,
+		isPost: false,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
