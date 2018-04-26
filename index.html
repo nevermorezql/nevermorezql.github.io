@@ -157,30 +157,71 @@ var _hmt = _hmt || [];
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-Android Binder机制-5(Framework)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-TF-简单使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/30/Android Binder机制-5(Framework)/">Binder-5 (framework)</a>
+      <a class="article-title" href="/2018/04/26/TF-简单使用/">TensorFlow 简单使用</a>
     </h1>
   
 
         
-        <a href="/2018/03/30/Android Binder机制-5(Framework)/" class="archive-article-date">
-  	<time datetime="2018-03-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-30</time>
+        <a href="/2018/04/26/TF-简单使用/" class="archive-article-date">
+  	<time datetime="2018-04-25T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-26</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>不详细介绍，贴几张图（来源于Gityuan的博客）：</p>
-<h4 id="framework-Binder架构图"><a href="#framework-Binder架构图" class="headerlink" title="framework Binder架构图"></a>framework Binder架构图</h4><p><img src="http://gityuan.com/images/binder/java_binder/java_binder.jpg" alt="image"></p>
-<h4 id="framework的binder类关系图"><a href="#framework的binder类关系图" class="headerlink" title="framework的binder类关系图"></a>framework的binder类关系图</h4><p><img src="http://gityuan.com/images/binder/java_binder/class_ServiceManager.jpg" alt="image"></p>
-<h4 id="Binder类分层"><a href="#Binder类分层" class="headerlink" title="Binder类分层"></a>Binder类分层</h4><p><img src="http://gityuan.com/images/binder/java_binder_framework.jpg" alt="image"></p>
+        <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>基于TensorFlow的NN：</p>
+<ul>
+<li>用张量表示数据 </li>
+<li>用计算图搭建神经网络</li>
+<li>用会话执行计算图</li>
+<li>优化线上的权重（参数）</li>
+<li>得到模型</li>
+</ul>
+<p>张量：</p>
+<ul>
+<li>多维数组</li>
+<li>阶：张量的维数</li>
+</ul>
+<p>计算图（Graph）：<br>搭建神经网络的计算过程，只搭建，不运算</p>
+<p>会话（Session）:<br>执行计算图的运算</p>
+<hr>
+<h3 id="正向传播"><a href="#正向传播" class="headerlink" title="正向传播"></a>正向传播</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">w = tf.Variable(tf.random_normal([2,3],stddev=2,mean=0,seed=1))</div><div class="line"></div><div class="line">[2,3]-&gt;表示是一个2行3列的矩阵</div><div class="line">random_normal -&gt;正态分布</div><div class="line">stddev -&gt; 标准差</div><div class="line">mean -&gt; 均值为0</div><div class="line">seed -&gt; 随机种子</div><div class="line">truncated_normal -&gt; 去掉大偏离点的正态分布</div><div class="line">random_uniform -&gt; 平均分布</div><div class="line"></div><div class="line">tf.zeros 全0数组</div><div class="line">tf.ones 全1数组</div><div class="line">tf.fill 全定值数组</div><div class="line">tf.constant 直接给定值</div></pre></td></tr></table></figure>
+<p>SampleCode:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">import tensorflow as tf</div><div class="line"></div><div class="line">x = tf.constant([[0.7,0.5]])</div><div class="line">w1 = tf.Variable(tf.random_normal([2, 3], stddev=1, seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3, 1], stddev=1, seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x, w1)</div><div class="line">y = tf.matmul(a, w2)</div><div class="line"></div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    print sess.run(y)</div><div class="line"></div><div class="line">--------------------------------------------------</div><div class="line"># one line data</div><div class="line"></div><div class="line">import tensorflow as tf</div><div class="line">x = tf.placeholder(tf.float32, shape=(1, 2))</div><div class="line"></div><div class="line">w1 = tf.Variable(tf.random_normal([2, 3],stddev=1,seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3, 1],stddev=1,seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x,w1)</div><div class="line">y = tf.matmul(a,w2)</div><div class="line"></div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    print sess.run(y, feed_dict=&#123;x:[[0.7,0.5]]&#125;)</div><div class="line"></div><div class="line">---------------------------------------------------</div><div class="line"></div><div class="line">import tensorflow as tf</div><div class="line">x = tf.placeholder(tf.float32, shape=(None, 2)) # means it could be many couples of data</div><div class="line"></div><div class="line">w1 = tf.Variable(tf.random_normal([2, 3],stddev=1,seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3, 1],stddev=1,seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x,w1)</div><div class="line">y = tf.matmul(a,w2)</div><div class="line"></div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    print sess.run(y, feed_dict=&#123;x:[[0.7,0.5],[0.2,0.3],[0.4,0.5]]&#125;)</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h3><p>作用: 训练模型参数，在所有参数上用梯度下降是NN模型在训练数据上的损失函数最小</p>
+<p>损失函数： 预测值（y） 与 已知答案(y_)的差距</p>
+<p>均方误差： loss = tf.reduce_mean(tf<em>square(y</em> - y))</p>
+<p>反向传播训练方法：以减小loss值为优化目标</p>
+<ol>
+<li>train_step = tf.train.GradientDesentOptimier(leaning_rate).minimize(loss) 梯度下降</li>
+<li>train_step = tf.train.MomentumOptimier(leaning_rate).minimize(loss)</li>
+<li>train_step = tf.train.AdamOptimier(leaning_rate).minimize(loss)</li>
+</ol>
+<p>学习率：决定参数每次更新的幅度(太小消耗计算资源，太大错过最右解)</p>
+<p>神经网络的实现过程：</p>
+<ol>
+<li>准备数据集，提取特征，作为输入喂给神经网络</li>
+<li>搭建NN结构，从输入到输出（搭建计算图，执行session输入）<ul>
+<li>正向传播 -&gt; 计算输出</li>
+</ul>
+</li>
+<li>大量特征数据喂给NN，迭代优化NN参数<ul>
+<li>反向传播 -&gt; 调整参数</li>
+</ul>
+</li>
+<li>使用训练好的模型预测和分类</li>
+</ol>
+<p>Sample Code:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">#coding:utf-8</div><div class="line">#0 导入模块，生成模拟数据集</div><div class="line">import tensorflow as tf</div><div class="line">import numpy as np</div><div class="line">BATCH_SIZE = 8 # 一次喂给神经网络的输入数据组数</div><div class="line">seed = 23455</div><div class="line"></div><div class="line">#给予seed产生随机数</div><div class="line">rng = np.random.RandomState(seed)</div><div class="line"></div><div class="line">#随机生成输入输出(相当于准备数据集)</div><div class="line">X = rng.rand(32,2) # 生成32行两列的数据</div><div class="line">Y = [[int(x0 + x1 &lt; 1)] for (x0,x1) in X] # 输入的两个特性相加小于1 ，表示为1,其它为0 ,输出</div><div class="line"></div><div class="line">print &quot;X: \n&quot;,X</div><div class="line">print &quot;Y: \n&quot;,Y</div><div class="line"></div><div class="line">#定义神经网络的输入、参数、定义前向传播过程</div><div class="line">x = tf.placeholder(tf.float32,shape(None,2)) # 未知组，两列数据</div><div class="line">y_ = tf.placeholder(tf.float32,shape=(None,1)) # 未知组数，单列的数据</div><div class="line"></div><div class="line">w1 = tf.Variable(tf.random_normal([2,3],stddev=1,seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3,1],stddev=1,seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x,w1)</div><div class="line">y = tf.matmul(a,w2)</div><div class="line"></div><div class="line"># 定义损失函数 以及 反向传播方法</div><div class="line">loss = tf.reduce_mean(tf.square(y-y_))</div><div class="line">train_step = tf.train.GradientDescentOptimizer(0.001).minimize(loss)</div><div class="line"></div><div class="line"># 执行sess,开始预测</div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    </div><div class="line">    #输出随机生成的w1,w2</div><div class="line">    print &quot;W1:\n&quot;,sess.run(w1)</div><div class="line">    print &quot;W2:\n&quot;,sess.run(w2)</div><div class="line">    </div><div class="line">    STEPS = 100 # 先训练100步</div><div class="line">    for i in range(STEPS):</div><div class="line">        start = (i*BATCH_SIZE) % 32</div><div class="line">        end = start + BATCH_SIZE</div><div class="line">        sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y[start:end]&#125;)</div><div class="line">        if i%20 == 0: # 没训练20次，打印一下loss)</div><div class="line">            total_loss = sess.run(loss, feed_dict=&#123;x: X, y_: Y&#125;)</div><div class="line">            print (&quot;%d steps,loss %g&quot; %(i,total_loss))</div><div class="line">    print &quot;\n&quot;</div><div class="line">    print &quot;W1:\n&quot;,sess.run(w1)</div><div class="line">    print &quot;W2:\n&quot;,sess.run(W2)</div></pre></td></tr></table></figure>
 
       
 
@@ -194,7 +235,7 @@ var _hmt = _hmt || [];
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
         		</li>
       		
 		</ul>
@@ -206,7 +247,7 @@ var _hmt = _hmt || [];
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        			<a href="/categories/TF/" class="article-tag-list-link color3">TF</a>
         		</li>
       		
 		</ul>
@@ -215,7 +256,7 @@ var _hmt = _hmt || [];
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2018/03/30/Android Binder机制-5(Framework)/">展开全文 >></a>
+          <a class="article-more-a" href="/2018/04/26/TF-简单使用/">展开全文 >></a>
         </p>
       
 
@@ -321,6 +362,94 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2018/03/30/Android Binder机制-4（注册和获取服务）/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Android Binder机制-5(Framework)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/30/Android Binder机制-5(Framework)/">Binder-5 (framework)</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/30/Android Binder机制-5(Framework)/" class="archive-article-date">
+  	<time datetime="2018-03-29T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>不详细介绍，贴几张图（来源于Gityuan的博客）：</p>
+<h4 id="framework-Binder架构图"><a href="#framework-Binder架构图" class="headerlink" title="framework Binder架构图"></a>framework Binder架构图</h4><p><img src="http://gityuan.com/images/binder/java_binder/java_binder.jpg" alt="image"></p>
+<h4 id="framework的binder类关系图"><a href="#framework的binder类关系图" class="headerlink" title="framework的binder类关系图"></a>framework的binder类关系图</h4><p><img src="http://gityuan.com/images/binder/java_binder/class_ServiceManager.jpg" alt="image"></p>
+<h4 id="Binder类分层"><a href="#Binder类分层" class="headerlink" title="Binder类分层"></a>Binder类分层</h4><p><img src="http://gityuan.com/images/binder/java_binder_framework.jpg" alt="image"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/30/Android Binder机制-5(Framework)/">展开全文 >></a>
         </p>
       
 
@@ -1224,116 +1353,6 @@ var _hmt = _hmt || [];
 
 
   
-    <article id="post-Activity四种启动模式以及taskAffinity的使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
-    </h1>
-  
-
-        
-        <a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
-  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="四种启动模式"><a href="#四种启动模式" class="headerlink" title="四种启动模式"></a>四种启动模式</h2><ol>
-<li>standard 标准模式（默认的模式）<blockquote>
-<p>每次启动都会在当前的任务栈中生成一个新的Activity实例</p>
-</blockquote>
-</li>
-<li>singleTop 栈顶单一模式<blockquote>
-<p>如果此Activity已经存在于栈顶，则直接走onNewIntent，onResume ,不会再创建实例（不会走onCreate onStart）;如果此Activity不存于栈顶，栈的中间位置，则类似于standard新生成一个实例</p>
-</blockquote>
-</li>
-<li>singleTask 栈中唯一模式<blockquote>
-<p>如果此Activity已经存在于栈中，则把该Activity之上所有其他的Activity全部弹出栈（销毁，会走onDestroy方法），调用此Acitivity的onNewIntent、onReume、onStart</p>
-</blockquote>
-</li>
-<li>singleInstance 全局唯一模式<blockquote>
-<p>独享一个栈空间，全部如果存在此Activity 则走onNewIntent 和 onResume ,因为此模式是独享新栈，在此Activity上面再启动其他的activity的时候，会回到之前的栈，如果此时再back，会在前一个栈走完后，才会回到新的此Activity的栈</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h2><p>当开始一个没有Intent.FLAG_ACTIVITY_NEW_TASK标志的Activity时，任务共用性affinities不会影响将会运行该新活动的Task:它总是运行在启动它的Task里。但是，如果使用了NEW_TASK标志，那么共用性（affinity）将被用来判断是否已经存在一个有相同共用性（affinity）的Task。如果是这样，这项Task将被切换到前面而新的Activity会启动于这个Task的顶层。</p>
-<p>跟 Task 有关的 manifest文件中Activity的特性值介绍<br>android:allowTaskReparenting<br>    用来标记Activity能否从启动的Task移动到有着affinity的Task（当这个Task进入到前台时）</p>
-<p>   “true”，表示能移动，“false”，表示它必须呆在启动时呆在的那个Task里。</p>
-<p>如果这个特性没有被设定，设定到<application>元素上的allowTaskReparenting特性的值会应用到Activity上。默认值为“false”。</application></p>
-<p>一般来说，当Activity启动后，它就与启动它的Task关联，并且在那里耗尽它的整个生命周期。当当前的Task不再显示时，你可以使用这个特性来强制Activity移动到有着affinity的Task中。典型用法是：把一个应用程序的Activity移到另一个应用程序的主Task中。 </p>
-<h2 id="gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。"><a href="#gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。" class="headerlink" title="&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。"></a>&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。</h2><blockquote>
-<p>Actvity的affinity是由taskAffinity特性定义的。Task的affinity是通过读取根Activity的affinity决定。因此，根Activity总是位于相同affinity的Task里。由于启动模式为“singleTask”和“singleInstance”的Activity只能位于Task的底部，因此，重新宿主只能限于“standard”和“singleTop”模式。</p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
@@ -1432,6 +1451,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">技术</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">AI</a>
               </li>
              
               <li class="article-tag-list-item">

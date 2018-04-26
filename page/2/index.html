@@ -325,6 +325,116 @@ var _hmt = _hmt || [];
 
 
   
+    <article id="post-Activity四种启动模式以及taskAffinity的使用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">Android启动模式</a>
+    </h1>
+  
+
+        
+        <a href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/" class="archive-article-date">
+  	<time datetime="2018-03-11T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="四种启动模式"><a href="#四种启动模式" class="headerlink" title="四种启动模式"></a>四种启动模式</h2><ol>
+<li>standard 标准模式（默认的模式）<blockquote>
+<p>每次启动都会在当前的任务栈中生成一个新的Activity实例</p>
+</blockquote>
+</li>
+<li>singleTop 栈顶单一模式<blockquote>
+<p>如果此Activity已经存在于栈顶，则直接走onNewIntent，onResume ,不会再创建实例（不会走onCreate onStart）;如果此Activity不存于栈顶，栈的中间位置，则类似于standard新生成一个实例</p>
+</blockquote>
+</li>
+<li>singleTask 栈中唯一模式<blockquote>
+<p>如果此Activity已经存在于栈中，则把该Activity之上所有其他的Activity全部弹出栈（销毁，会走onDestroy方法），调用此Acitivity的onNewIntent、onReume、onStart</p>
+</blockquote>
+</li>
+<li>singleInstance 全局唯一模式<blockquote>
+<p>独享一个栈空间，全部如果存在此Activity 则走onNewIntent 和 onResume ,因为此模式是独享新栈，在此Activity上面再启动其他的activity的时候，会回到之前的栈，如果此时再back，会在前一个栈走完后，才会回到新的此Activity的栈</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="taskAffinity"><a href="#taskAffinity" class="headerlink" title="taskAffinity"></a>taskAffinity</h2><p>当开始一个没有Intent.FLAG_ACTIVITY_NEW_TASK标志的Activity时，任务共用性affinities不会影响将会运行该新活动的Task:它总是运行在启动它的Task里。但是，如果使用了NEW_TASK标志，那么共用性（affinity）将被用来判断是否已经存在一个有相同共用性（affinity）的Task。如果是这样，这项Task将被切换到前面而新的Activity会启动于这个Task的顶层。</p>
+<p>跟 Task 有关的 manifest文件中Activity的特性值介绍<br>android:allowTaskReparenting<br>    用来标记Activity能否从启动的Task移动到有着affinity的Task（当这个Task进入到前台时）</p>
+<p>   “true”，表示能移动，“false”，表示它必须呆在启动时呆在的那个Task里。</p>
+<p>如果这个特性没有被设定，设定到<application>元素上的allowTaskReparenting特性的值会应用到Activity上。默认值为“false”。</application></p>
+<p>一般来说，当Activity启动后，它就与启动它的Task关联，并且在那里耗尽它的整个生命周期。当当前的Task不再显示时，你可以使用这个特性来强制Activity移动到有着affinity的Task中。典型用法是：把一个应用程序的Activity移到另一个应用程序的主Task中。 </p>
+<h2 id="gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。"><a href="#gt-如，如果-email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email-Task的一部分。如果它重新宿主到Browser-Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email-Task再次进入前台时，就看不到它了。" class="headerlink" title="&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。"></a>&gt;如，如果 email中包含一个web页的链接，点击它就会启动一个Activity来显示这个页面。这个Activity是由Browser应用程序定义的，但是，现在它作为email Task的一部分。如果它重新宿主到Browser Task里，当Browser下一次进入到前台时，它就能被看见，并且，当email Task再次进入前台时，就看不到它了。</h2><blockquote>
+<p>Actvity的affinity是由taskAffinity特性定义的。Task的affinity是通过读取根Activity的affinity决定。因此，根Activity总是位于相同affinity的Task里。由于启动模式为“singleTask”和“singleInstance”的Activity只能位于Task的底部，因此，重新宿主只能限于“standard”和“singleTop”模式。</p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/03/12/Activity四种启动模式以及taskAffinity的使用/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Room &amp; LifecycleComponent &amp; LiveData" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1511,166 +1621,6 @@ var _hmt = _hmt || [];
 
 
   
-    <article id="post-2017-8-11-view-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/11/2017-8-11-view-1/">View绘制学习笔记(1)</a>
-    </h1>
-  
-
-        
-        <a href="/2017/08/11/2017-8-11-view-1/" class="archive-article-date">
-  	<time datetime="2017-08-11T04:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="View绘制学习笔记一"><a href="#View绘制学习笔记一" class="headerlink" title="View绘制学习笔记一"></a>View绘制学习笔记一</h2><h3 id="提纲"><a href="#提纲" class="headerlink" title="提纲"></a>提纲</h3><ul>
-<li>自定义绘制的方式是重写绘制方法，其中最常用的是 onDraw()</li>
-<li>绘制的关键是 Canvas 的使用<ul>
-<li>Canvas 的绘制类方法： drawXXX() （关键参数：Paint）</li>
-<li>Canvas 的辅助类方法：范围裁切和几何变换</li>
-</ul>
-</li>
-<li>可以使用不同的绘制方法来控制遮盖关系</li>
-</ul>
-<h3 id="Canvas-画布"><a href="#Canvas-画布" class="headerlink" title="Canvas 画布"></a>Canvas 画布</h3><ul>
-<li>概念<ul>
-<li>onDraw传递进来的唯一参数，控件的绘制都是在Canvas中完成</li>
-</ul>
-</li>
-<li><p>画布提供的绘制相关的方法drawXXXX  </p>
-<ul>
-<li>drawColor(drawRGB or drawARGB) 图层上面直接绘制颜色</li>
-<li>drawPaint(paint) 在整个图层上直接使用画笔绘制(整个图层一般是一个矩形)</li>
-<li>drawPoint 画点(可以通过Paint设置 圆点还是方点)</li>
-<li>drawLine 画线</li>
-<li>drawRect 绘制矩形</li>
-<li><p>drawOval 四个参数代表椭圆的左上角和右下角的坐标 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drawOval(float left, float top, float right, float bottom, Paint paint)</div></pre></td></tr></table></figure>
-</li>
-<li><p>drawCircle 绘制圆形 参数分别为 圆心坐标和半径    </p>
-</li>
-<li>drawArc 参数类似于drawOval ，多了一个useCenter ,如果为true 则为扇形，否则就是为一个弧形,sweepAngle 转过的角度，起始的角度可以任意设置</li>
-<li><p>drawRoundRect 绘制圆角矩形 ,其中rx和ry分别代表横向的半径和纵向的半径</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry,</div><div class="line">       @NonNull Paint paint)</div></pre></td></tr></table></figure>
-</li>
-<li><p>drawPath 绘制复杂图像用到，Path是作为绘制复杂图像的工具类</p>
-</li>
-<li>drawPatch 绘制点九图 </li>
-<li>drawBitmap 绘制图片</li>
-<li>drawVertices ????</li>
-<li>drawText 绘制文本</li>
-<li>drawTextRun </li>
-<li>drawTextOnPath 在Path上面绘制文字</li>
-<li>drawPicture </li>
-</ul>
-</li>
-</ul>
-<h3 id="Path"><a href="#Path" class="headerlink" title="Path"></a>Path</h3><ul>
-<li><p>概念</p>
-<ul>
-<li>辅助绘制复杂图形的工具类，可以添加多个不同的图形，移动，划线等等</li>
-</ul>
-</li>
-<li><p>Path提供的方法</p>
-<ul>
-<li>reset 清空已经设置的全部的轨迹和图形</li>
-<li>rewind 类似于reset（新建对象，之前的对象直接舍弃），当时保留了内部的数据接口，再次使用时，不需要重新新建各种对象</li>
-<li>op(Path,Op) 结合两个Path，Op结合的策略</li>
-<li>FillType 填充的类型</li>
-<li>isRect(RectF) 判断是否是矩形，如果是，添加到Path</li>
-<li>moveTo 具体坐标 rMoveTo 相对于当前点的坐标</li>
-<li>lineTo 连线 rLineTo 相对坐标 </li>
-<li>quadTo(float x1, float y1, float x2, float y2)[rQuadTo] 二次贝塞尔曲线</li>
-<li>cubicTo rCubicTo float x1, float y1, float x2, float y2,float x3, float y3) 三次贝塞尔曲线</li>
-<li>arcTo(float left, float top, float right, float bottom, float startAngle,float sweepAngle, boolean forceMoveTo)  圆弧，forceMoveTo判断是否移动目标点，false 会留下轨迹</li>
-<li>close 闭合，相当于画一条线连接起始点【如果是Fill 自动闭合】，如果本身存在交叉，调用此方法将没有任何作用，另外绘制圆弧的其实点，不在线开始的地方，而在矩形的左上角</li>
-</ul>
-</li>
-</ul>
-<h3 id="绘制饼图、柱状图、折线图-等"><a href="#绘制饼图、柱状图、折线图-等" class="headerlink" title="绘制饼图、柱状图、折线图 等"></a>绘制饼图、柱状图、折线图 等</h3><h4 id="绘制饼图"><a href="#绘制饼图" class="headerlink" title="绘制饼图"></a>绘制饼图</h4><p>效果图<img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/pai_chart.png" alt=":"><br>实现方式:</p>
-<ol>
-<li>绘制圆形 drawArc,设置好偏移</li>
-<li>每绘制一个弧形，都需要重新设置画笔颜色</li>
-<li>startX,startY,gap 设置好的参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">protected void onDraw(Canvas canvas) &#123;</div><div class="line">        super.onDraw(canvas);</div><div class="line">        paint.setColor(Color.RED);</div><div class="line">        canvas.drawArc(startX, startY, startX + 400, startY + 400, -45, -135, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.BLUE);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, -45, 45, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.BLACK);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 0, 20, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.GREEN);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 20, 40, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.GRAY);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 60, 60, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.YELLOW);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 120, 35, true, paint);</div><div class="line"></div><div class="line">        paint.setColor(Color.LTGRAY);</div><div class="line">        canvas.drawArc(startX + gap, startY + gap, startX + gap + 400, startY + gap + 400, 155, 25, true, paint);</div><div class="line"></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h4 id="绘制心形-和-文字"><a href="#绘制心形-和-文字" class="headerlink" title="绘制心形 和 文字"></a>绘制心形 和 文字</h4><ol>
-<li>主要通过调用drawPath 和 drawText 这两个API</li>
-<li>如果Paint设置为Fill，如果绘制的线存在交叉，将不会填充，只有不交叉的图形才会填充</li>
-</ol>
-<p><img src="http://lovemingnuo.oss-cn-beijing.aliyuncs.com/blog/heart-text.png" alt="image"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">private void init() &#123;</div><div class="line">        paint = new Paint();</div><div class="line">        paint.setAntiAlias(true);</div><div class="line">        paint.setColor(Color.BLACK);</div><div class="line">        paint.setStyle(Paint.Style.FILL);</div><div class="line">        path = new Path();</div><div class="line">        path.addArc(startX, startY, startX + 200, startY + 200, 0, -180);</div><div class="line">        path.addArc(startX + 200, startY, startX + 400, startY + 200, 0, -180);</div><div class="line">        path.moveTo(startX + 400, startY + 100);</div><div class="line">        path.rLineTo(-200, 250);</div><div class="line">        path.lineTo(startX, startY + 100);</div><div class="line"></div><div class="line">        textPaint = new Paint();</div><div class="line">        textPaint.setColor(Color.BLACK);</div><div class="line">        textPaint.setAntiAlias(true);</div><div class="line">        textPaint.setStrokeWidth(6);</div><div class="line">        textPaint.setTextSize(80);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDraw(Canvas canvas) &#123;</div><div class="line">        super.onDraw(canvas);</div><div class="line">        canvas.drawPath(path, paint);</div><div class="line">        canvas.drawText(&quot;周一诺是个胖子&quot;, 100, 600, textPaint);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/08/11/2017-8-11-view-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -1769,6 +1719,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">技术</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">AI</a>
               </li>
              
               <li class="article-tag-list-item">

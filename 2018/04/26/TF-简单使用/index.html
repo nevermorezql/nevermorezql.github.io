@@ -6,18 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives | NEVERMORE</title>
+  <title>TensorFlow 简单使用 | NEVERMORE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="周庆龙个人技术博客">
-<meta property="og:type" content="website">
-<meta property="og:title" content="NEVERMORE">
-<meta property="og:url" content="http://yoursite.com/archives/page/3/index.html">
+  <meta name="description" content="概念基于TensorFlow的NN：  用张量表示数据  用计算图搭建神经网络 用会话执行计算图 优化线上的权重（参数） 得到模型  张量：  多维数组 阶：张量的维数  计算图（Graph）：搭建神经网络的计算过程，只搭建，不运算 会话（Session）:执行计算图的运算  正向传播1234567891011121314w = tf.Variable(tf.random_normal([2,3]">
+<meta name="keywords" content="AI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TensorFlow 简单使用">
+<meta property="og:url" content="http://yoursite.com/2018/04/26/TF-简单使用/index.html">
 <meta property="og:site_name" content="NEVERMORE">
-<meta property="og:description" content="周庆龙个人技术博客">
+<meta property="og:description" content="概念基于TensorFlow的NN：  用张量表示数据  用计算图搭建神经网络 用会话执行计算图 优化线上的权重（参数） 得到模型  张量：  多维数组 阶：张量的维数  计算图（Graph）：搭建神经网络的计算过程，只搭建，不运算 会话（Session）:执行计算图的运算  正向传播1234567891011121314w = tf.Variable(tf.random_normal([2,3]">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-26T01:15:38.777Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="NEVERMORE">
-<meta name="twitter:description" content="周庆龙个人技术博客">
+<meta name="twitter:title" content="TensorFlow 简单使用">
+<meta name="twitter:description" content="概念基于TensorFlow的NN：  用张量表示数据  用计算图搭建神经网络 用会话执行计算图 优化线上的权重（参数） 得到模型  张量：  多维数组 阶：张量的维数  计算图（Graph）：搭建神经网络的计算过程，只搭建，不运算 会话（Session）:执行计算图的运算  正向传播1234567891011121314w = tf.Variable(tf.random_normal([2,3]">
   
     <link rel="alternative" href="/atom.xml" title="NEVERMORE" type="application/atom+xml">
   
@@ -155,123 +157,209 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-TF-简单使用" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/11/2017-8-11-view-1/" class="archive-article-date">
-  	<time datetime="2017-08-11T04:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-11</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/11/2017-8-11-view-1/">View绘制学习笔记(1)</a>
+    <h1 class="article-title" itemprop="name">
+      TensorFlow 简单使用
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2018/04/26/TF-简单使用/" class="archive-article-date">
+  	<time datetime="2018-04-25T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-04-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>基于TensorFlow的NN：</p>
+<ul>
+<li>用张量表示数据 </li>
+<li>用计算图搭建神经网络</li>
+<li>用会话执行计算图</li>
+<li>优化线上的权重（参数）</li>
+<li>得到模型</li>
+</ul>
+<p>张量：</p>
+<ul>
+<li>多维数组</li>
+<li>阶：张量的维数</li>
+</ul>
+<p>计算图（Graph）：<br>搭建神经网络的计算过程，只搭建，不运算</p>
+<p>会话（Session）:<br>执行计算图的运算</p>
+<hr>
+<h3 id="正向传播"><a href="#正向传播" class="headerlink" title="正向传播"></a>正向传播</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">w = tf.Variable(tf.random_normal([2,3],stddev=2,mean=0,seed=1))</div><div class="line"></div><div class="line">[2,3]-&gt;表示是一个2行3列的矩阵</div><div class="line">random_normal -&gt;正态分布</div><div class="line">stddev -&gt; 标准差</div><div class="line">mean -&gt; 均值为0</div><div class="line">seed -&gt; 随机种子</div><div class="line">truncated_normal -&gt; 去掉大偏离点的正态分布</div><div class="line">random_uniform -&gt; 平均分布</div><div class="line"></div><div class="line">tf.zeros 全0数组</div><div class="line">tf.ones 全1数组</div><div class="line">tf.fill 全定值数组</div><div class="line">tf.constant 直接给定值</div></pre></td></tr></table></figure>
+<p>SampleCode:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">import tensorflow as tf</div><div class="line"></div><div class="line">x = tf.constant([[0.7,0.5]])</div><div class="line">w1 = tf.Variable(tf.random_normal([2, 3], stddev=1, seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3, 1], stddev=1, seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x, w1)</div><div class="line">y = tf.matmul(a, w2)</div><div class="line"></div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    print sess.run(y)</div><div class="line"></div><div class="line">--------------------------------------------------</div><div class="line"># one line data</div><div class="line"></div><div class="line">import tensorflow as tf</div><div class="line">x = tf.placeholder(tf.float32, shape=(1, 2))</div><div class="line"></div><div class="line">w1 = tf.Variable(tf.random_normal([2, 3],stddev=1,seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3, 1],stddev=1,seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x,w1)</div><div class="line">y = tf.matmul(a,w2)</div><div class="line"></div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    print sess.run(y, feed_dict=&#123;x:[[0.7,0.5]]&#125;)</div><div class="line"></div><div class="line">---------------------------------------------------</div><div class="line"></div><div class="line">import tensorflow as tf</div><div class="line">x = tf.placeholder(tf.float32, shape=(None, 2)) # means it could be many couples of data</div><div class="line"></div><div class="line">w1 = tf.Variable(tf.random_normal([2, 3],stddev=1,seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3, 1],stddev=1,seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x,w1)</div><div class="line">y = tf.matmul(a,w2)</div><div class="line"></div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    print sess.run(y, feed_dict=&#123;x:[[0.7,0.5],[0.2,0.3],[0.4,0.5]]&#125;)</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h3><p>作用: 训练模型参数，在所有参数上用梯度下降是NN模型在训练数据上的损失函数最小</p>
+<p>损失函数： 预测值（y） 与 已知答案(y_)的差距</p>
+<p>均方误差： loss = tf.reduce_mean(tf<em>square(y</em> - y))</p>
+<p>反向传播训练方法：以减小loss值为优化目标</p>
+<ol>
+<li>train_step = tf.train.GradientDesentOptimier(leaning_rate).minimize(loss) 梯度下降</li>
+<li>train_step = tf.train.MomentumOptimier(leaning_rate).minimize(loss)</li>
+<li>train_step = tf.train.AdamOptimier(leaning_rate).minimize(loss)</li>
+</ol>
+<p>学习率：决定参数每次更新的幅度(太小消耗计算资源，太大错过最右解)</p>
+<p>神经网络的实现过程：</p>
+<ol>
+<li>准备数据集，提取特征，作为输入喂给神经网络</li>
+<li>搭建NN结构，从输入到输出（搭建计算图，执行session输入）<ul>
+<li>正向传播 -&gt; 计算输出</li>
+</ul>
+</li>
+<li>大量特征数据喂给NN，迭代优化NN参数<ul>
+<li>反向传播 -&gt; 调整参数</li>
+</ul>
+</li>
+<li>使用训练好的模型预测和分类</li>
+</ol>
+<p>Sample Code:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">#coding:utf-8</div><div class="line">#0 导入模块，生成模拟数据集</div><div class="line">import tensorflow as tf</div><div class="line">import numpy as np</div><div class="line">BATCH_SIZE = 8 # 一次喂给神经网络的输入数据组数</div><div class="line">seed = 23455</div><div class="line"></div><div class="line">#给予seed产生随机数</div><div class="line">rng = np.random.RandomState(seed)</div><div class="line"></div><div class="line">#随机生成输入输出(相当于准备数据集)</div><div class="line">X = rng.rand(32,2) # 生成32行两列的数据</div><div class="line">Y = [[int(x0 + x1 &lt; 1)] for (x0,x1) in X] # 输入的两个特性相加小于1 ，表示为1,其它为0 ,输出</div><div class="line"></div><div class="line">print &quot;X: \n&quot;,X</div><div class="line">print &quot;Y: \n&quot;,Y</div><div class="line"></div><div class="line">#定义神经网络的输入、参数、定义前向传播过程</div><div class="line">x = tf.placeholder(tf.float32,shape(None,2)) # 未知组，两列数据</div><div class="line">y_ = tf.placeholder(tf.float32,shape=(None,1)) # 未知组数，单列的数据</div><div class="line"></div><div class="line">w1 = tf.Variable(tf.random_normal([2,3],stddev=1,seed=1))</div><div class="line">w2 = tf.Variable(tf.random_normal([3,1],stddev=1,seed=1))</div><div class="line"></div><div class="line">a = tf.matmul(x,w1)</div><div class="line">y = tf.matmul(a,w2)</div><div class="line"></div><div class="line"># 定义损失函数 以及 反向传播方法</div><div class="line">loss = tf.reduce_mean(tf.square(y-y_))</div><div class="line">train_step = tf.train.GradientDescentOptimizer(0.001).minimize(loss)</div><div class="line"></div><div class="line"># 执行sess,开始预测</div><div class="line">with tf.Session() as sess:</div><div class="line">    init_op = tf.global_variables_initializer()</div><div class="line">    sess.run(init_op)</div><div class="line">    </div><div class="line">    #输出随机生成的w1,w2</div><div class="line">    print &quot;W1:\n&quot;,sess.run(w1)</div><div class="line">    print &quot;W2:\n&quot;,sess.run(w2)</div><div class="line">    </div><div class="line">    STEPS = 100 # 先训练100步</div><div class="line">    for i in range(STEPS):</div><div class="line">        start = (i*BATCH_SIZE) % 32</div><div class="line">        end = start + BATCH_SIZE</div><div class="line">        sess.run(train_step,feed_dict=&#123;x:X[start:end],y_:Y[start:end]&#125;)</div><div class="line">        if i%20 == 0: # 没训练20次，打印一下loss)</div><div class="line">            total_loss = sess.run(loss, feed_dict=&#123;x: X, y_: Y&#125;)</div><div class="line">            print (&quot;%d steps,loss %g&quot; %(i,total_loss))</div><div class="line">    print &quot;\n&quot;</div><div class="line">    print &quot;W1:\n&quot;,sess.run(w1)</div><div class="line">    print &quot;W2:\n&quot;,sess.run(W2)</div></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">技术</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">AI</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/View/" class="article-tag-list-link color5">View</a>
+        			<a href="/categories/TF/" class="article-tag-list-link color3">TF</a>
         		</li>
       		
 		</ul>
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2018/04/26/TF-简单使用/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2017/08/09/about-study/" class="archive-article-date">
-  	<time datetime="2017-08-09T07:20:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-08-09</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2018/03/30/Android Binder机制-4（注册和获取服务）/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Binder-4 (addService and getService)</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/08/09/about-study/">关于学习</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">随笔</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/得到APP/" class="article-tag-list-link color1">得到APP</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+
   
   
-    </div></section>
+  
+  <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+<script>
+  var cloudTieConfig = {
+    url: "http://yoursite.com/2018/04/26/TF-简单使用/", 
+    sourceId: "TF-简单使用",
+    productKey: "true",
+    target: "cloud-tie-wrapper"
+  };
+</script>
+<script src="//img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/page/2/">&laquo; Prev</a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><span class="page-number current">3</span>
-    </nav>
+  
+
   
 
 
@@ -295,8 +383,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
